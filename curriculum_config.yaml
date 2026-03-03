@@ -1,0 +1,104 @@
+# Curriculum Learning Config for Robotron
+# Start VERY simple and gradually increase difficulty
+
+screen_size: [1280, 720]
+play_area: [116, 309, 608, 974]
+resource_path: "resources/"
+
+# Simplified waves - much easier progression
+waves:
+    # Grunts, Electrodes, Hulks, Brains, Sphereoids, Quarks, Mommies, Daddies, Mikeys
+    - [3, 0, 0, 0, 0, 0, 1, 0, 0]     # 1: Just 3 grunts + 1 family (learn to shoot & collect)
+    - [5, 1, 0, 0, 0, 0, 1, 0, 0]     # 2: More grunts + 1 obstacle
+    - [8, 2, 0, 0, 0, 0, 1, 1, 0]     # 3: Even more grunts + obstacles
+    - [10, 3, 1, 0, 0, 0, 1, 1, 1]    # 4: Add 1 hulk (learn they're invincible)
+    - [12, 4, 2, 0, 0, 0, 2, 1, 1]    # 5: More of everything
+    - [15, 5, 2, 0, 1, 0, 2, 2, 1]    # 6: Introduce spheroid (spawner)
+    - [17, 6, 3, 0, 1, 0, 2, 2, 2]    # 7: More spheroids
+    - [20, 8, 3, 1, 1, 0, 3, 2, 2]    # 8: Introduce brain (shoots missiles)
+    - [22, 10, 4, 2, 2, 0, 3, 3, 2]   # 9: More brains and spheroids
+    - [25, 12, 5, 3, 2, 1, 3, 3, 3]   # 10: Introduce quark (tank spawner)
+    - [30, 15, 5, 4, 3, 1, 4, 3, 3]   # 11+: Gradually increase to normal difficulty
+    - [35, 18, 6, 5, 3, 1, 4, 4, 3]
+    - [40, 20, 7, 6, 4, 2, 5, 4, 4]
+    - [45, 22, 8, 7, 4, 2, 5, 5, 4]
+    - [50, 25, 10, 8, 5, 2, 6, 5, 5]
+    - [55, 25, 10, 9, 5, 3, 6, 6, 5]
+    - [60, 25, 12, 10, 5, 3, 7, 6, 6]
+    - [65, 25, 12, 11, 6, 3, 7, 7, 6]
+    - [70, 25, 13, 12, 6, 4, 8, 7, 7]
+    - [75, 25, 14, 13, 6, 4, 8, 8, 7]
+
+extra_life_score: 25000
+
+# Reward structure optimized for RL
+grunt:
+    score: 100
+    speed: 5  # Slightly slower to start
+    move_delay: [8, 30]  # Slower movement
+
+electrode:
+    score: 50  # Reward avoiding/destroying
+
+hulk:
+    score: 0  # Can't be destroyed
+
+brain:
+    score: 500
+    speed: 1
+    use_mikey_bug: True
+    programming_time: 80  # Slower programming
+    programming_offset: 10
+    shoot_delays: [120, 800]  # Shoots less frequently
+
+cruisemissile:
+    score: 300  # High reward for shooting these
+    speed: 2  # Slower
+    time_to_live: 150
+
+sphereoid:
+    score: 1000
+    speed: 3  # Slower
+    move_delays: [15, 40]
+    move_curvatures: [-30, 30]  # Less erratic
+    spawn_delays: [40, 100]  # Spawns less often
+    spawn_counts: [1, 3]  # Spawns fewer
+
+enforcer:
+    score: 400
+    max_speed: 15  # Slower
+    shoot_delays: [25, 80]  # Shoots less frequently
+
+enforcerbullet:
+    score: 250
+    max_speed: 20  # Slower
+    time_to_live: 40  # Dies sooner
+
+quark:
+    score: 1000
+    speed: 0.5
+    move_delays: [10, 40]
+    spawn_delays: [20, 150]  # Spawns less often
+    spawn_counts: [1, 3]  # Spawns fewer
+
+tank:
+    score: 400
+    bullets: 15  # Fewer bullets
+    shoot_delays: [50, 400]  # Shoots less frequently
+
+tankshell:
+    score: 250
+    min_speed: 8  # Slower
+    max_speed: 15
+    time_to_live: 60  # Dies sooner
+
+family:
+    speed: 3  # Slower (easier to collect)
+    move_delay: 8
+    score: [200, 400, 600, 800, 1000]  # Progressive rewards
+
+prog:
+    score: 300
+    speed: 3  # Slower
+    move_delay: 8
+    programming_time: 80

@@ -1,0 +1,57 @@
+[project]
+name = "robotron-rl"
+version = "0.1.0"
+description = "Reinforcement learning training for Robotron 2084"
+authors = [{name = "Your Name", email = "your.email@example.com"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+
+[tool.poetry]
+package-mode = false  # We're not packaging this project, just managing dependencies
+
+[tool.poetry.dependencies]
+python = "^3.10"
+# Install the robotron gym environment from the submodule
+robotron2084gym = {path = "robotron2084gym", develop = true}
+
+# NumPy - use 1.26.x for compatibility with most packages
+# (numpy 2.x is too new for many ML libraries)
+numpy = "^1.26.0"
+
+# RL training dependencies
+stable-baselines3 = "^2.3.0"
+sb3-contrib = "^2.3.0"
+torch = "^2.4.0"
+
+# Observation preprocessing
+gymnasium = "^1.0.0"  # Wrappers (GrayScale, Resize, etc.)
+opencv-python = "^4.10.0"  # Required by ResizeObservation wrapper
+
+# Logging and monitoring
+wandb = {extras = ["media"], version = "^0.22.2"}
+tensorboard = "^2.18.0"
+
+# Utilities
+pyyaml = "^6.0.0"
+
+# YOLO11 object detection
+ultralytics = "^8.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+black = "^24.0.0"
+ruff = "^0.7.0"
+ipython = "^8.12.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

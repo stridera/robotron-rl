@@ -1,0 +1,139 @@
+# Progressive Curriculum for Position-Based RL
+# Gradually scale from 1 grunt (proven success) to full game complexity
+# Testing if position-based RL can handle realistic scenarios
+
+# Required config
+screen_size: [1280, 720]
+play_area: [116, 309, 608, 974]
+resource_path: "resources/"
+
+# Wave format: [grunts, electrodes, hulks, brains, sphereoids, quarks, mommies, daddies, mikeys]
+
+waves:
+  # Stage 1 (Levels 1-3): Proven success - 1-3 grunts only
+  # Agent already masters this from Phase 1
+  - [1, 0, 0, 0, 0, 0, 0, 0, 0]  # Level 1: 1 grunt (warm-up)
+  - [2, 0, 0, 0, 0, 0, 0, 0, 0]  # Level 2: 2 grunts
+  - [3, 0, 0, 0, 0, 0, 0, 0, 0]  # Level 3: 3 grunts
+
+  # Stage 2 (Levels 4-6): Add obstacles and family
+  # Learn to navigate around obstacles while killing grunts
+  - [3, 1, 0, 0, 0, 0, 1, 0, 0]  # Level 4: 3 grunts + 1 obstacle + 1 family
+  - [5, 2, 0, 0, 0, 0, 1, 0, 0]  # Level 5: 5 grunts + obstacles
+  - [5, 3, 0, 0, 0, 0, 1, 1, 0]  # Level 6: More obstacles + family
+
+  # Stage 3 (Levels 7-9): Introduce hulks (invincible, must avoid)
+  # Test if agent learns to ignore/avoid unkillable enemies
+  - [5, 3, 1, 0, 0, 0, 1, 1, 0]  # Level 7: Add 1 hulk
+  - [8, 4, 1, 0, 0, 0, 2, 1, 1]  # Level 8: More grunts + hulk
+  - [8, 5, 2, 0, 0, 0, 2, 1, 1]  # Level 9: 2 hulks
+
+  # Stage 4 (Levels 10-12): Scale to realistic grunt counts (10-15)
+  # Critical test: Can MLP handle 10+ sprites effectively?
+  - [10, 5, 2, 0, 0, 0, 2, 1, 1]  # Level 10: 10 grunts
+  - [12, 6, 2, 0, 0, 0, 2, 2, 1]  # Level 11: 12 grunts
+  - [15, 8, 3, 0, 0, 0, 2, 2, 2]  # Level 12: 15 grunts (realistic)
+
+  # Stage 5 (Levels 13-15): Introduce spawners (sphereoids, brains)
+  # Enemies that create more enemies - need prioritization
+  - [15, 8, 3, 1, 0, 0, 2, 2, 2]  # Level 13: Add 1 brain (spawns missiles)
+  - [15, 8, 3, 1, 1, 0, 2, 2, 2]  # Level 14: Add 1 spheroid (spawns enforcers)
+  - [17, 10, 3, 2, 1, 0, 3, 2, 2] # Level 15: Multiple spawners
+
+  # Stage 6 (Levels 16-18): Add tank spawners (quarks)
+  # Most complex spawner - creates tanks that shoot
+  - [17, 10, 3, 2, 1, 1, 3, 2, 2] # Level 16: Add 1 quark
+  - [20, 12, 4, 2, 2, 1, 3, 3, 2] # Level 17: More spawners
+  - [20, 12, 4, 3, 2, 1, 3, 3, 3] # Level 18: Dense spawners
+
+  # Stage 7 (Levels 19-21): Scale to full difficulty
+  # Close to original game levels
+  - [25, 15, 5, 3, 2, 1, 4, 3, 3] # Level 19: Many enemies
+  - [30, 18, 5, 4, 3, 1, 4, 4, 3] # Level 20: Very dense
+  - [35, 20, 6, 5, 3, 2, 5, 4, 4] # Level 21: Full game difficulty
+
+  # Stage 8 (Levels 22+): Sustained high difficulty
+  # Test if agent can maintain performance over time
+  - [40, 22, 7, 6, 4, 2, 5, 5, 4] # Level 22+
+  - [45, 25, 8, 7, 4, 2, 6, 5, 5]
+  - [50, 25, 10, 8, 5, 2, 6, 6, 5]
+  - [55, 25, 10, 9, 5, 3, 7, 6, 6]
+  - [60, 25, 12, 10, 5, 3, 7, 7, 6]
+  - [65, 25, 12, 11, 6, 3, 8, 7, 7]
+  - [70, 25, 13, 12, 6, 4, 8, 8, 7]
+  - [75, 25, 14, 13, 6, 4, 8, 8, 8]
+
+# Extra life every 25k points
+extra_life_score: 25000
+
+# Enemy configurations - slightly easier than default but realistic
+grunt:
+    score: 100
+    speed: 6  # Slightly slower than default (7)
+    move_delay: [8, 30]
+
+electrode:
+    score: 50
+
+hulk:
+    score: 0  # Can't be destroyed
+
+brain:
+    score: 500
+    speed: 1
+    use_mikey_bug: True
+    programming_time: 80
+    programming_offset: 10
+    shoot_delays: [120, 800]  # Shoots less frequently than default
+
+cruisemissile:
+    score: 300
+    speed: 3  # Slightly slower than default (4)
+    time_to_live: 150
+
+sphereoid:
+    score: 1000
+    speed: 4  # Slightly slower than default (5)
+    move_delays: [15, 40]
+    move_curvatures: [-30, 30]
+    spawn_delays: [40, 100]  # Spawns less often
+    spawn_counts: [1, 3]
+
+enforcer:
+    score: 400
+    max_speed: 18  # Slightly slower than default (20)
+    shoot_delays: [25, 80]
+
+enforcerbullet:
+    score: 250
+    max_speed: 22  # Slightly slower than default (25)
+    time_to_live: 40
+
+quark:
+    score: 1000
+    speed: 0.5
+    move_delays: [10, 40]
+    spawn_delays: [20, 150]
+    spawn_counts: [1, 3]
+
+tank:
+    score: 400
+    bullets: 15
+    shoot_delays: [50, 400]
+
+tankshell:
+    score: 250
+    min_speed: 10  # Slightly slower than default
+    max_speed: 18
+    time_to_live: 60
+
+family:
+    speed: 3
+    move_delay: 8
+    score: [200, 400, 600, 800, 1000]
+
+prog:
+    score: 300
+    speed: 4  # Slightly slower than default
+    move_delay: 8
+    programming_time: 80

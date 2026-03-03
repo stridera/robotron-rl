@@ -1,7 +1,7 @@
 import argparse
 
-from robotron2084gym.robotron import RobotronEnv
-from gym.wrappers import GrayScaleObservation, ResizeObservation
+from robotron import RobotronEnv
+from gymnasium.wrappers import GrayscaleObservation, ResizeObservation
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
 from sb3_contrib import QRDQN
@@ -33,7 +33,8 @@ def main(args):
     run.log_code()
     run.log_code(name="game_config", include_fn=lambda x: x.endswith(".yaml"))
 
-    env = GrayScaleObservation(env, keep_dim=True)
+    env = RobotronEnv(**env_config)
+    env = GrayscaleObservation(env, keep_dim=True)
     env = ResizeObservation(env, (123, 166))
     env = Monitor(env, info_keywords=('score', 'level'))
     env = DummyVecEnv([lambda: env])

@@ -1,0 +1,206 @@
+================================================================================
+FSM PARAMETER SWEEP
+================================================================================
+Testing 5 variants, 10 episodes each
+
+
+================================================================================
+Testing Variant: v1_baseline
+================================================================================
+Patched FSM with config: v1_baseline
+  Danger distances: 60/120/180/250
+  Edge params: edge_threshold=100, danger_zone_center=200
+  Episode 1/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2500
+  Episode 2/10... Running in headless mode (off-screen rendering).
+Level 0, Score 100
+  Episode 3/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1700
+  Episode 4/10... Running in headless mode (off-screen rendering).
+Level 0, Score 300
+  Episode 5/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2500
+  Episode 6/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3050
+  Episode 7/10... Running in headless mode (off-screen rendering).
+Level 0, Score 100
+  Episode 8/10... Running in headless mode (off-screen rendering).
+Level 1, Score 4300
+  Episode 9/10... Running in headless mode (off-screen rendering).
+Level 1, Score 4700
+  Episode 10/10... Running in headless mode (off-screen rendering).
+Level 1, Score 1600
+
+v1_baseline Results:
+  Score: 2085.0 ± 1564.3
+  Level: 0.6 (max 1)
+  Survival: 934 steps
+  % in danger zone: 50.7%
+  Avg edge distance: 111.2 px
+  Top death cause: ('Trapped in center', 10)
+
+================================================================================
+Testing Variant: v2_strong_edge
+================================================================================
+Patched FSM with config: v2_strong_edge
+  Danger distances: 60/120/180/250
+  Edge params: edge_threshold=150, danger_zone_center=150
+  Episode 1/10... Running in headless mode (off-screen rendering).
+Level 0, Score 700
+  Episode 2/10... Running in headless mode (off-screen rendering).
+Level 1, Score 4050
+  Episode 3/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1100
+  Episode 4/10... Running in headless mode (off-screen rendering).
+Level 0, Score 100
+  Episode 5/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2600
+  Episode 6/10... Running in headless mode (off-screen rendering).
+Level 0, Score 0
+  Episode 7/10... Running in headless mode (off-screen rendering).
+Level 0, Score 4000
+  Episode 8/10... Running in headless mode (off-screen rendering).
+Level 1, Score 1700
+  Episode 9/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1300
+  Episode 10/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1000
+
+v2_strong_edge Results:
+  Score: 1655.0 ± 1380.7
+  Level: 0.3 (max 1)
+  Survival: 753 steps
+  % in danger zone: 64.3%
+  Avg edge distance: 119.5 px
+  Top death cause: ('Trapped in center', 10)
+
+================================================================================
+Testing Variant: v3_very_defensive
+================================================================================
+Patched FSM with config: v3_very_defensive
+  Danger distances: 80/150/220/300
+  Edge params: edge_threshold=100, danger_zone_center=180
+  Episode 1/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1200
+  Episode 2/10... Running in headless mode (off-screen rendering).
+Level 0, Score 700
+  Episode 3/10... Running in headless mode (off-screen rendering).
+Level 0, Score 400
+  Episode 4/10... Running in headless mode (off-screen rendering).
+Level 1, Score 1600
+  Episode 5/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2600
+  Episode 6/10... Running in headless mode (off-screen rendering).
+Level 1, Score 4700
+  Episode 7/10... Running in headless mode (off-screen rendering).
+Level 1, Score 6400
+  Episode 8/10... Running in headless mode (off-screen rendering).
+Level 0, Score 400
+  Episode 9/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2500
+  Episode 10/10... Running in headless mode (off-screen rendering).
+Level 1, Score 1800
+
+v3_very_defensive Results:
+  Score: 2230.0 ± 1854.2
+  Level: 0.6 (max 1)
+  Survival: 948 steps
+  % in danger zone: 48.8%
+  Avg edge distance: 92.9 px
+  Top death cause: ('Trapped in center', 8)
+
+================================================================================
+Testing Variant: v4_aggressive
+================================================================================
+Patched FSM with config: v4_aggressive
+  Danger distances: 50/100/150/200
+  Edge params: edge_threshold=80, danger_zone_center=200
+  Episode 1/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2100
+  Episode 2/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2500
+  Episode 3/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3200
+  Episode 4/10... Running in headless mode (off-screen rendering).
+Level 0, Score 100
+  Episode 5/10... Running in headless mode (off-screen rendering).
+Level 1, Score 5700
+  Episode 6/10... Running in headless mode (off-screen rendering).
+Level 1, Score 6100
+  Episode 7/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3500
+  Episode 8/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3600
+  Episode 9/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3500
+  Episode 10/10... Running in headless mode (off-screen rendering).
+Level 1, Score 4550
+
+v4_aggressive Results:
+  Score: 3485.0 ± 1652.9
+  Level: 0.9 (max 1)
+  Survival: 1580 steps
+  % in danger zone: 40.7%
+  Avg edge distance: 91.0 px
+  Top death cause: ('Trapped in center', 8)
+
+================================================================================
+Testing Variant: v5_adaptive
+================================================================================
+Patched FSM with config: v5_adaptive
+  Danger distances: 70/130/190/260
+  Edge params: edge_threshold=120, danger_zone_center=180
+  Episode 1/10... Running in headless mode (off-screen rendering).
+Level 0, Score 200
+  Episode 2/10... Running in headless mode (off-screen rendering).
+Level 1, Score 2800
+  Episode 3/10... Running in headless mode (off-screen rendering).
+Level 1, Score 5600
+  Episode 4/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1700
+  Episode 5/10... Running in headless mode (off-screen rendering).
+Level 0, Score 500
+  Episode 6/10... Running in headless mode (off-screen rendering).
+Level 0, Score 800
+  Episode 7/10... Running in headless mode (off-screen rendering).
+Level 0, Score 300
+  Episode 8/10... Running in headless mode (off-screen rendering).
+Level 1, Score 3000
+  Episode 9/10... Running in headless mode (off-screen rendering).
+Level 0, Score 1300
+  Episode 10/10... Running in headless mode (off-screen rendering).
+Level 0, Score 700
+
+v5_adaptive Results:
+  Score: 1690.0 ± 1604.0
+  Level: 0.3 (max 1)
+  Survival: 628 steps
+  % in danger zone: 66.4%
+  Avg edge distance: 120.7 px
+  Top death cause: ('Trapped in center', 10)
+
+================================================================================
+VARIANT COMPARISON
+================================================================================
+
+Variant              Avg Level    Max Level    Avg Score       % Danger     Edge Dist
+--------------------------------------------------------------------------------
+v1_baseline          0.6          1            2085            50.7         111.2
+v2_strong_edge       0.3          1            1655            64.3         119.5
+v3_very_defensive    0.6          1            2230            48.8         92.9
+v4_aggressive        0.9          1            3485            40.7         91.0
+v5_adaptive          0.3          1            1690            66.4         120.7
+
+🏆 Best max level: v1_baseline (Level 1)
+🏆 Best avg level: v4_aggressive (0.9)
+🏆 Best positioning: v4_aggressive (40.7% in danger)
+
+================================================================================
+RECOMMENDATION
+================================================================================
+⚠️  Best variant (v1_baseline) only reaches level 1
+   Need more improvements before imitation learning
+   Next steps:
+   - Implement cluster avoidance
+   - Add spawner hunting mode
+   - Improve projectile prediction

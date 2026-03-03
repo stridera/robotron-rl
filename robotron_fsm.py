@@ -61,7 +61,7 @@ import argparse
 import math
 import time
 from os import path
-from robotron2084gym.robotron import RobotronEnv
+from robotron import RobotronEnv
 INVALID = -1
 
 # Grid and Distance

@@ -1,0 +1,2511 @@
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+wandb: Tracking run with wandb version 0.22.2
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /home/strider/Code/robotron-rl/wandb/offline-run-20251013_233120-ot9m8v4i
+================================================================================
+POSITION-BASED RL TRAINING
+================================================================================
+  Observation: Sprite positions (222 dims, not 28k pixels!)
+  Policy: MlpPolicy (2x256 layers, not CNN)
+  Reward: score_delta / 10.0
+  Config: ultra_simple_curriculum.yaml
+  Max sprites: 10
+================================================================================
+
+🎯 TESTING: Can PPO solve this with perfect position info?
+   If YES → vision was the bottleneck, use detector approach
+   If NO → PPO can't solve this task, need different algorithm
+
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+  warnings.warn(
+/home/strider/Code/robotron-rl/.venv/lib/python3.12/site-packages/stable_baselines3/common/on_policy_algorithm.py:150: UserWarning: You are trying to run PPO on the GPU, but it is primarily intended to run on the CPU when not using a CNN policy (you are using ActorCriticPolicy which should be a MlpPolicy). See https://github.com/DLR-RM/stable-baselines3/issues/1245 for more info. You can pass `device='cpu'` or `export CUDA_VISIBLE_DEVICES=` to force using the CPU.Note: The model will train, but the GPU utilization will be poor and the training might take longer than on CPU.
+  warnings.warn(
+Using cuda:0 device
+
+Starting training...
+Expected: Should learn MUCH faster than pixel-based (~10-100x)
+Target: Kill 1 grunt consistently within 100k-200k steps
+
+Logging to runs/ot9m8v4i/PPO_1
+Episode: score=7500, kills=75, best=7500
+Episode: score=8350, kills=83, best=8350
+---------------------------------
+| robotron/          |          |
+|    episode_kills   | 83       |
+|    episode_score   | 8350     |
+|    highest_score   | 8350     |
+| rollout/           |          |
+|    ep_len_mean     | 1.93e+03 |
+|    ep_rew_mean     | 792      |
+| time/              |          |
+|    fps             | 470      |
+|    iterations      | 1        |
+|    time_elapsed    | 34       |
+|    total_timesteps | 16384    |
+---------------------------------
+Episode: score=11450, kills=114, best=11450
+Episode: score=10500, kills=105, best=11450
+Episode: score=11200, kills=112, best=11450
+Episode: score=3400, kills=34, best=11450
+Episode: score=18400, kills=184, best=18400
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 184         |
+|    episode_score        | 18400       |
+|    highest_score        | 18400       |
+| rollout/                |             |
+|    ep_len_mean          | 2.38e+03    |
+|    ep_rew_mean          | 1.01e+03    |
+| time/                   |             |
+|    fps                  | 404         |
+|    iterations           | 2           |
+|    time_elapsed         | 81          |
+|    total_timesteps      | 32768       |
+| train/                  |             |
+|    approx_kl            | 0.016093604 |
+|    clip_fraction        | 0.203       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.15       |
+|    explained_variance   | 0.00228     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 22.3        |
+|    n_updates            | 10          |
+|    policy_gradient_loss | -0.0224     |
+|    value_loss           | 36.2        |
+-----------------------------------------
+Episode: score=7500, kills=75, best=18400
+Episode: score=20500, kills=205, best=20500
+Episode: score=7650, kills=76, best=20500
+Episode: score=11150, kills=111, best=20500
+Episode: score=17000, kills=170, best=20500
+Episode: score=27700, kills=277, best=27700
+Episode: score=4250, kills=42, best=27700
+Episode: score=13400, kills=134, best=27700
+Episode: score=6300, kills=63, best=27700
+Episode: score=10100, kills=101, best=27700
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 101         |
+|    episode_score        | 10100       |
+|    highest_score        | 27700       |
+| rollout/                |             |
+|    ep_len_mean          | 2.51e+03    |
+|    ep_rew_mean          | 1.16e+03    |
+| time/                   |             |
+|    fps                  | 395         |
+|    iterations           | 3           |
+|    time_elapsed         | 124         |
+|    total_timesteps      | 49152       |
+| train/                  |             |
+|    approx_kl            | 0.015893133 |
+|    clip_fraction        | 0.21        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.13       |
+|    explained_variance   | 0.296       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 13.9        |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.0217     |
+|    value_loss           | 39          |
+-----------------------------------------
+Episode: score=9350, kills=93, best=27700
+Episode: score=2100, kills=21, best=27700
+Episode: score=4600, kills=46, best=27700
+Episode: score=16850, kills=168, best=27700
+Episode: score=6150, kills=61, best=27700
+Episode: score=13350, kills=133, best=27700
+Episode: score=15400, kills=154, best=27700
+Episode: score=7300, kills=73, best=27700
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 73          |
+|    episode_score        | 7300        |
+|    highest_score        | 27700       |
+| rollout/                |             |
+|    ep_len_mean          | 2.29e+03    |
+|    ep_rew_mean          | 1.09e+03    |
+| time/                   |             |
+|    fps                  | 390         |
+|    iterations           | 4           |
+|    time_elapsed         | 167         |
+|    total_timesteps      | 65536       |
+| train/                  |             |
+|    approx_kl            | 0.017893877 |
+|    clip_fraction        | 0.241       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.11       |
+|    explained_variance   | 0.321       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 17.1        |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.0249     |
+|    value_loss           | 42.9        |
+-----------------------------------------
+Episode: score=7100, kills=71, best=27700
+Episode: score=4900, kills=49, best=27700
+Episode: score=20100, kills=201, best=27700
+Episode: score=11750, kills=117, best=27700
+Episode: score=7550, kills=75, best=27700
+Episode: score=5950, kills=59, best=27700
+Episode: score=8150, kills=81, best=27700
+Episode: score=9950, kills=99, best=27700
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 99          |
+|    episode_score        | 9950        |
+|    highest_score        | 27700       |
+| rollout/                |             |
+|    ep_len_mean          | 2.17e+03    |
+|    ep_rew_mean          | 1.05e+03    |
+| time/                   |             |
+|    fps                  | 385         |
+|    iterations           | 5           |
+|    time_elapsed         | 212         |
+|    total_timesteps      | 81920       |
+| train/                  |             |
+|    approx_kl            | 0.017954353 |
+|    clip_fraction        | 0.246       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.09       |
+|    explained_variance   | 0.3         |
+|    learning_rate        | 0.0003      |
+|    loss                 | 21.5        |
+|    n_updates            | 40          |
+|    policy_gradient_loss | -0.026      |
+|    value_loss           | 47.7        |
+-----------------------------------------
+Episode: score=11900, kills=119, best=27700
+Episode: score=6750, kills=67, best=27700
+Episode: score=10500, kills=105, best=27700
+Episode: score=4100, kills=41, best=27700
+Episode: score=5250, kills=52, best=27700
+Episode: score=10350, kills=103, best=27700
+Episode: score=14600, kills=146, best=27700
+Episode: score=14950, kills=149, best=27700
+Episode: score=7700, kills=77, best=27700
+Episode: score=6550, kills=65, best=27700
+Episode: score=7150, kills=71, best=27700
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 71          |
+|    episode_score        | 7150        |
+|    highest_score        | 27700       |
+| rollout/                |             |
+|    ep_len_mean          | 2.06e+03    |
+|    ep_rew_mean          | 1.02e+03    |
+| time/                   |             |
+|    fps                  | 381         |
+|    iterations           | 6           |
+|    time_elapsed         | 257         |
+|    total_timesteps      | 98304       |
+| train/                  |             |
+|    approx_kl            | 0.019991323 |
+|    clip_fraction        | 0.27        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.06       |
+|    explained_variance   | 0.265       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 23.1        |
+|    n_updates            | 50          |
+|    policy_gradient_loss | -0.0299     |
+|    value_loss           | 48.9        |
+-----------------------------------------
+Episode: score=6950, kills=69, best=27700
+✅ Saved at 100,000 steps
+
+============================================================
+🎥 Recording video at 100,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=2900, kills=29, best=27700
+Episode: score=10050, kills=100, best=27700
+Episode: score=4550, kills=45, best=27700
+Episode: score=6700, kills=67, best=27700
+Episode: score=14650, kills=146, best=27700
+Episode: score=4950, kills=49, best=27700
+Episode: score=23400, kills=234, best=27700
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 234         |
+|    episode_score        | 23400       |
+|    highest_score        | 27700       |
+| rollout/                |             |
+|    ep_len_mean          | 1.99e+03    |
+|    ep_rew_mean          | 1e+03       |
+| time/                   |             |
+|    fps                  | 377         |
+|    iterations           | 7           |
+|    time_elapsed         | 303         |
+|    total_timesteps      | 114688      |
+| train/                  |             |
+|    approx_kl            | 0.021056673 |
+|    clip_fraction        | 0.291       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -4.03       |
+|    explained_variance   | 0.298       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 32.6        |
+|    n_updates            | 60          |
+|    policy_gradient_loss | -0.0336     |
+|    value_loss           | 49.1        |
+-----------------------------------------
+Episode: score=7600, kills=76, best=27700
+Episode: score=11350, kills=113, best=27700
+Episode: score=17950, kills=179, best=27700
+Episode: score=16750, kills=167, best=27700
+Episode: score=30500, kills=305, best=30500
+Episode: score=12050, kills=120, best=30500
+Episode: score=10200, kills=102, best=30500
+Episode: score=12300, kills=123, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 123        |
+|    episode_score        | 12300      |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 2.03e+03   |
+|    ep_rew_mean          | 1.07e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 8          |
+|    time_elapsed         | 350        |
+|    total_timesteps      | 131072     |
+| train/                  |            |
+|    approx_kl            | 0.02233006 |
+|    clip_fraction        | 0.299      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -4.01      |
+|    explained_variance   | 0.285      |
+|    learning_rate        | 0.0003     |
+|    loss                 | 38.5       |
+|    n_updates            | 70         |
+|    policy_gradient_loss | -0.0352    |
+|    value_loss           | 55         |
+----------------------------------------
+Episode: score=5750, kills=57, best=30500
+Episode: score=20150, kills=201, best=30500
+Episode: score=6350, kills=63, best=30500
+Episode: score=1400, kills=14, best=30500
+Episode: score=9900, kills=99, best=30500
+Episode: score=13650, kills=136, best=30500
+Episode: score=8700, kills=87, best=30500
+Episode: score=17300, kills=173, best=30500
+Episode: score=3450, kills=34, best=30500
+Episode: score=7350, kills=73, best=30500
+Episode: score=19900, kills=199, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 199         |
+|    episode_score        | 19900       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.99e+03    |
+|    ep_rew_mean          | 1.06e+03    |
+| time/                   |             |
+|    fps                  | 372         |
+|    iterations           | 9           |
+|    time_elapsed         | 396         |
+|    total_timesteps      | 147456      |
+| train/                  |             |
+|    approx_kl            | 0.024354089 |
+|    clip_fraction        | 0.307       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.98       |
+|    explained_variance   | 0.295       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 17          |
+|    n_updates            | 80          |
+|    policy_gradient_loss | -0.0395     |
+|    value_loss           | 55.4        |
+-----------------------------------------
+Episode: score=9250, kills=92, best=30500
+Episode: score=2900, kills=29, best=30500
+Episode: score=7450, kills=74, best=30500
+Episode: score=11400, kills=114, best=30500
+Episode: score=8700, kills=87, best=30500
+Episode: score=9050, kills=90, best=30500
+Episode: score=800, kills=8, best=30500
+Episode: score=16250, kills=162, best=30500
+Episode: score=4350, kills=43, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 43          |
+|    episode_score        | 4350        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.92e+03    |
+|    ep_rew_mean          | 1.03e+03    |
+| time/                   |             |
+|    fps                  | 371         |
+|    iterations           | 10          |
+|    time_elapsed         | 440         |
+|    total_timesteps      | 163840      |
+| train/                  |             |
+|    approx_kl            | 0.025471566 |
+|    clip_fraction        | 0.319       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.96       |
+|    explained_variance   | 0.289       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 15.8        |
+|    n_updates            | 90          |
+|    policy_gradient_loss | -0.041      |
+|    value_loss           | 56          |
+-----------------------------------------
+Episode: score=3350, kills=33, best=30500
+Episode: score=24900, kills=249, best=30500
+Episode: score=7950, kills=79, best=30500
+Episode: score=7500, kills=75, best=30500
+Episode: score=22900, kills=229, best=30500
+Episode: score=4500, kills=45, best=30500
+Episode: score=14500, kills=145, best=30500
+Episode: score=15100, kills=151, best=30500
+Episode: score=7650, kills=76, best=30500
+Episode: score=6000, kills=60, best=30500
+Episode: score=11300, kills=113, best=30500
+Episode: score=5050, kills=50, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 50          |
+|    episode_score        | 5050        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.89e+03    |
+|    ep_rew_mean          | 1.04e+03    |
+| time/                   |             |
+|    fps                  | 371         |
+|    iterations           | 11          |
+|    time_elapsed         | 485         |
+|    total_timesteps      | 180224      |
+| train/                  |             |
+|    approx_kl            | 0.029079873 |
+|    clip_fraction        | 0.344       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.93       |
+|    explained_variance   | 0.264       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 19.3        |
+|    n_updates            | 100         |
+|    policy_gradient_loss | -0.0445     |
+|    value_loss           | 49.6        |
+-----------------------------------------
+Episode: score=14700, kills=147, best=30500
+Episode: score=17400, kills=174, best=30500
+Episode: score=7150, kills=71, best=30500
+Episode: score=11050, kills=110, best=30500
+Episode: score=8250, kills=82, best=30500
+Episode: score=2000, kills=20, best=30500
+Episode: score=1200, kills=12, best=30500
+Episode: score=8400, kills=84, best=30500
+Episode: score=13450, kills=134, best=30500
+Episode: score=6750, kills=67, best=30500
+Episode: score=9750, kills=97, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 97          |
+|    episode_score        | 9750        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.83e+03    |
+|    ep_rew_mean          | 1.03e+03    |
+| time/                   |             |
+|    fps                  | 370         |
+|    iterations           | 12          |
+|    time_elapsed         | 530         |
+|    total_timesteps      | 196608      |
+| train/                  |             |
+|    approx_kl            | 0.028022425 |
+|    clip_fraction        | 0.339       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.91       |
+|    explained_variance   | 0.206       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 23.5        |
+|    n_updates            | 110         |
+|    policy_gradient_loss | -0.0438     |
+|    value_loss           | 61.1        |
+-----------------------------------------
+Episode: score=11200, kills=112, best=30500
+Episode: score=22650, kills=226, best=30500
+✅ Saved at 200,000 steps
+
+============================================================
+🎥 Recording video at 200,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=9950, kills=99, best=30500
+Episode: score=9700, kills=97, best=30500
+Episode: score=8700, kills=87, best=30500
+Episode: score=5550, kills=55, best=30500
+Episode: score=2400, kills=24, best=30500
+Episode: score=14000, kills=140, best=30500
+Episode: score=6100, kills=61, best=30500
+Episode: score=5550, kills=55, best=30500
+Episode: score=13850, kills=138, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 138         |
+|    episode_score        | 13850       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.69e+03    |
+|    ep_rew_mean          | 998         |
+| time/                   |             |
+|    fps                  | 370         |
+|    iterations           | 13          |
+|    time_elapsed         | 574         |
+|    total_timesteps      | 212992      |
+| train/                  |             |
+|    approx_kl            | 0.030516285 |
+|    clip_fraction        | 0.352       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.88       |
+|    explained_variance   | 0.219       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 16.5        |
+|    n_updates            | 120         |
+|    policy_gradient_loss | -0.0475     |
+|    value_loss           | 60.9        |
+-----------------------------------------
+Episode: score=10850, kills=108, best=30500
+Episode: score=4450, kills=44, best=30500
+Episode: score=22800, kills=228, best=30500
+Episode: score=10050, kills=100, best=30500
+Episode: score=13700, kills=137, best=30500
+Episode: score=14850, kills=148, best=30500
+Episode: score=10500, kills=105, best=30500
+Episode: score=15000, kills=150, best=30500
+Episode: score=11500, kills=115, best=30500
+Episode: score=5550, kills=55, best=30500
+Episode: score=10850, kills=108, best=30500
+Episode: score=12550, kills=125, best=30500
+Episode: score=5800, kills=58, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 58         |
+|    episode_score        | 5800       |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.65e+03   |
+|    ep_rew_mean          | 1.03e+03   |
+| time/                   |            |
+|    fps                  | 368        |
+|    iterations           | 14         |
+|    time_elapsed         | 622        |
+|    total_timesteps      | 229376     |
+| train/                  |            |
+|    approx_kl            | 0.03220376 |
+|    clip_fraction        | 0.364      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.85      |
+|    explained_variance   | 0.207      |
+|    learning_rate        | 0.0003     |
+|    loss                 | 36.3       |
+|    n_updates            | 130        |
+|    policy_gradient_loss | -0.0489    |
+|    value_loss           | 64         |
+----------------------------------------
+Episode: score=8650, kills=86, best=30500
+Episode: score=9550, kills=95, best=30500
+Episode: score=7500, kills=75, best=30500
+Episode: score=5350, kills=53, best=30500
+Episode: score=4300, kills=43, best=30500
+Episode: score=4550, kills=45, best=30500
+Episode: score=3300, kills=33, best=30500
+Episode: score=7300, kills=73, best=30500
+Episode: score=16600, kills=166, best=30500
+Episode: score=8550, kills=85, best=30500
+Episode: score=11850, kills=118, best=30500
+Episode: score=7900, kills=79, best=30500
+Episode: score=4650, kills=46, best=30500
+Episode: score=7350, kills=73, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 73          |
+|    episode_score        | 7350        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.53e+03    |
+|    ep_rew_mean          | 995         |
+| time/                   |             |
+|    fps                  | 368         |
+|    iterations           | 15          |
+|    time_elapsed         | 667         |
+|    total_timesteps      | 245760      |
+| train/                  |             |
+|    approx_kl            | 0.030850258 |
+|    clip_fraction        | 0.35        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.82       |
+|    explained_variance   | 0.235       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 39.2        |
+|    n_updates            | 140         |
+|    policy_gradient_loss | -0.0505     |
+|    value_loss           | 73.1        |
+-----------------------------------------
+Episode: score=4900, kills=49, best=30500
+Episode: score=6250, kills=62, best=30500
+Episode: score=19450, kills=194, best=30500
+Episode: score=6450, kills=64, best=30500
+Episode: score=6100, kills=61, best=30500
+Episode: score=2600, kills=26, best=30500
+Episode: score=16450, kills=164, best=30500
+Episode: score=10150, kills=101, best=30500
+Episode: score=2300, kills=23, best=30500
+Episode: score=5200, kills=52, best=30500
+Episode: score=15950, kills=159, best=30500
+Episode: score=6650, kills=66, best=30500
+Episode: score=5100, kills=51, best=30500
+Episode: score=7450, kills=74, best=30500
+Episode: score=7200, kills=72, best=30500
+Episode: score=3950, kills=39, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 39          |
+|    episode_score        | 3950        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.4e+03     |
+|    ep_rew_mean          | 941         |
+| time/                   |             |
+|    fps                  | 368         |
+|    iterations           | 16          |
+|    time_elapsed         | 712         |
+|    total_timesteps      | 262144      |
+| train/                  |             |
+|    approx_kl            | 0.034887195 |
+|    clip_fraction        | 0.373       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.79       |
+|    explained_variance   | 0.0895      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 15.6        |
+|    n_updates            | 150         |
+|    policy_gradient_loss | -0.0528     |
+|    value_loss           | 66.6        |
+-----------------------------------------
+Episode: score=7750, kills=77, best=30500
+Episode: score=9650, kills=96, best=30500
+Episode: score=7050, kills=70, best=30500
+Episode: score=5600, kills=56, best=30500
+Episode: score=9850, kills=98, best=30500
+Episode: score=10000, kills=100, best=30500
+Episode: score=3000, kills=30, best=30500
+Episode: score=5600, kills=56, best=30500
+Episode: score=12400, kills=124, best=30500
+Episode: score=4950, kills=49, best=30500
+Episode: score=5500, kills=55, best=30500
+Episode: score=9100, kills=91, best=30500
+Episode: score=9850, kills=98, best=30500
+Episode: score=8200, kills=82, best=30500
+Episode: score=12000, kills=120, best=30500
+Episode: score=9650, kills=96, best=30500
+Episode: score=1000, kills=10, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 10          |
+|    episode_score        | 1000        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.3e+03     |
+|    ep_rew_mean          | 904         |
+| time/                   |             |
+|    fps                  | 368         |
+|    iterations           | 17          |
+|    time_elapsed         | 756         |
+|    total_timesteps      | 278528      |
+| train/                  |             |
+|    approx_kl            | 0.036068488 |
+|    clip_fraction        | 0.388       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.77       |
+|    explained_variance   | 0.112       |
+|    learning_rate        | 0.0003      |
+|    loss                 | 26.5        |
+|    n_updates            | 160         |
+|    policy_gradient_loss | -0.0537     |
+|    value_loss           | 76.3        |
+-----------------------------------------
+Episode: score=7400, kills=74, best=30500
+Episode: score=14000, kills=140, best=30500
+Episode: score=4050, kills=40, best=30500
+Episode: score=4400, kills=44, best=30500
+Episode: score=10400, kills=104, best=30500
+Episode: score=8950, kills=89, best=30500
+Episode: score=6400, kills=64, best=30500
+Episode: score=4550, kills=45, best=30500
+Episode: score=14950, kills=149, best=30500
+Episode: score=13650, kills=136, best=30500
+Episode: score=11750, kills=117, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 117         |
+|    episode_score        | 11750       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.22e+03    |
+|    ep_rew_mean          | 888         |
+| time/                   |             |
+|    fps                  | 367         |
+|    iterations           | 18          |
+|    time_elapsed         | 801         |
+|    total_timesteps      | 294912      |
+| train/                  |             |
+|    approx_kl            | 0.036246408 |
+|    clip_fraction        | 0.393       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.74       |
+|    explained_variance   | 0.0917      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 32.4        |
+|    n_updates            | 170         |
+|    policy_gradient_loss | -0.0544     |
+|    value_loss           | 79.2        |
+-----------------------------------------
+Episode: score=6050, kills=60, best=30500
+Episode: score=6650, kills=66, best=30500
+Episode: score=23150, kills=231, best=30500
+Episode: score=9750, kills=97, best=30500
+Episode: score=3750, kills=37, best=30500
+Episode: score=13400, kills=134, best=30500
+✅ Saved at 300,000 steps
+
+============================================================
+🎥 Recording video at 300,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=15350, kills=153, best=30500
+Episode: score=10050, kills=100, best=30500
+Episode: score=17400, kills=174, best=30500
+Episode: score=4500, kills=45, best=30500
+Episode: score=7000, kills=70, best=30500
+Episode: score=6350, kills=63, best=30500
+Episode: score=15500, kills=155, best=30500
+Episode: score=6700, kills=67, best=30500
+Episode: score=14100, kills=141, best=30500
+Episode: score=5000, kills=50, best=30500
+Episode: score=8800, kills=88, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 88         |
+|    episode_score        | 8800       |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.21e+03   |
+|    ep_rew_mean          | 907        |
+| time/                   |            |
+|    fps                  | 367        |
+|    iterations           | 19         |
+|    time_elapsed         | 846        |
+|    total_timesteps      | 311296     |
+| train/                  |            |
+|    approx_kl            | 0.04085064 |
+|    clip_fraction        | 0.414      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.72      |
+|    explained_variance   | 0.101      |
+|    learning_rate        | 0.0003     |
+|    loss                 | 29.3       |
+|    n_updates            | 180        |
+|    policy_gradient_loss | -0.0585    |
+|    value_loss           | 71.8       |
+----------------------------------------
+Episode: score=13850, kills=138, best=30500
+Episode: score=7550, kills=75, best=30500
+Episode: score=7000, kills=70, best=30500
+Episode: score=5800, kills=58, best=30500
+Episode: score=8250, kills=82, best=30500
+Episode: score=11800, kills=118, best=30500
+Episode: score=5300, kills=53, best=30500
+Episode: score=12300, kills=123, best=30500
+Episode: score=19000, kills=190, best=30500
+Episode: score=7450, kills=74, best=30500
+Episode: score=15700, kills=157, best=30500
+Episode: score=10350, kills=103, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 103         |
+|    episode_score        | 10350       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.19e+03    |
+|    ep_rew_mean          | 912         |
+| time/                   |             |
+|    fps                  | 367         |
+|    iterations           | 20          |
+|    time_elapsed         | 891         |
+|    total_timesteps      | 327680      |
+| train/                  |             |
+|    approx_kl            | 0.039045166 |
+|    clip_fraction        | 0.394       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.67       |
+|    explained_variance   | 0.0984      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 26.9        |
+|    n_updates            | 190         |
+|    policy_gradient_loss | -0.056      |
+|    value_loss           | 82.2        |
+-----------------------------------------
+Episode: score=5200, kills=52, best=30500
+Episode: score=1300, kills=13, best=30500
+Episode: score=8850, kills=88, best=30500
+Episode: score=8500, kills=85, best=30500
+Episode: score=2500, kills=25, best=30500
+Episode: score=10350, kills=103, best=30500
+Episode: score=10250, kills=102, best=30500
+Episode: score=11950, kills=119, best=30500
+Episode: score=10550, kills=105, best=30500
+Episode: score=3450, kills=34, best=30500
+Episode: score=17350, kills=173, best=30500
+Episode: score=12750, kills=127, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 127         |
+|    episode_score        | 12750       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.13e+03    |
+|    ep_rew_mean          | 872         |
+| time/                   |             |
+|    fps                  | 367         |
+|    iterations           | 21          |
+|    time_elapsed         | 935         |
+|    total_timesteps      | 344064      |
+| train/                  |             |
+|    approx_kl            | 0.042855762 |
+|    clip_fraction        | 0.428       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.66       |
+|    explained_variance   | 0.0518      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 27.9        |
+|    n_updates            | 200         |
+|    policy_gradient_loss | -0.0582     |
+|    value_loss           | 71.2        |
+-----------------------------------------
+Episode: score=15200, kills=152, best=30500
+Episode: score=8750, kills=87, best=30500
+Episode: score=11550, kills=115, best=30500
+Episode: score=10150, kills=101, best=30500
+Episode: score=5150, kills=51, best=30500
+Episode: score=25700, kills=257, best=30500
+Episode: score=15450, kills=154, best=30500
+Episode: score=2800, kills=28, best=30500
+Episode: score=19300, kills=193, best=30500
+Episode: score=6100, kills=61, best=30500
+Episode: score=14450, kills=144, best=30500
+Episode: score=4150, kills=41, best=30500
+Episode: score=6600, kills=66, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 66         |
+|    episode_score        | 6600       |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.16e+03   |
+|    ep_rew_mean          | 916        |
+| time/                   |            |
+|    fps                  | 367        |
+|    iterations           | 22         |
+|    time_elapsed         | 981        |
+|    total_timesteps      | 360448     |
+| train/                  |            |
+|    approx_kl            | 0.04415409 |
+|    clip_fraction        | 0.426      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.62      |
+|    explained_variance   | 0.0766     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 30.8       |
+|    n_updates            | 210        |
+|    policy_gradient_loss | -0.0605    |
+|    value_loss           | 79.1       |
+----------------------------------------
+Episode: score=12000, kills=120, best=30500
+Episode: score=11350, kills=113, best=30500
+Episode: score=12150, kills=121, best=30500
+Episode: score=12200, kills=122, best=30500
+Episode: score=6800, kills=68, best=30500
+Episode: score=15800, kills=158, best=30500
+Episode: score=6800, kills=68, best=30500
+Episode: score=17900, kills=179, best=30500
+Episode: score=8950, kills=89, best=30500
+Episode: score=15700, kills=157, best=30500
+Episode: score=6400, kills=64, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 64          |
+|    episode_score        | 6400        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.18e+03    |
+|    ep_rew_mean          | 955         |
+| time/                   |             |
+|    fps                  | 367         |
+|    iterations           | 23          |
+|    time_elapsed         | 1024        |
+|    total_timesteps      | 376832      |
+| train/                  |             |
+|    approx_kl            | 0.043424413 |
+|    clip_fraction        | 0.423       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.59       |
+|    explained_variance   | 0.0854      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 36.6        |
+|    n_updates            | 220         |
+|    policy_gradient_loss | -0.0604     |
+|    value_loss           | 83.6        |
+-----------------------------------------
+Episode: score=10900, kills=109, best=30500
+Episode: score=12350, kills=123, best=30500
+Episode: score=13850, kills=138, best=30500
+Episode: score=11950, kills=119, best=30500
+Episode: score=8000, kills=80, best=30500
+Episode: score=15600, kills=156, best=30500
+Episode: score=3000, kills=30, best=30500
+Episode: score=13600, kills=136, best=30500
+Episode: score=3950, kills=39, best=30500
+Episode: score=13550, kills=135, best=30500
+Episode: score=8950, kills=89, best=30500
+Episode: score=5350, kills=53, best=30500
+Episode: score=7350, kills=73, best=30500
+Episode: score=9000, kills=90, best=30500
+Episode: score=14400, kills=144, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 144        |
+|    episode_score        | 14400      |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.21e+03   |
+|    ep_rew_mean          | 997        |
+| time/                   |            |
+|    fps                  | 368        |
+|    iterations           | 24         |
+|    time_elapsed         | 1067       |
+|    total_timesteps      | 393216     |
+| train/                  |            |
+|    approx_kl            | 0.04743281 |
+|    clip_fraction        | 0.444      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.57      |
+|    explained_variance   | 0.0666     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 23.4       |
+|    n_updates            | 230        |
+|    policy_gradient_loss | -0.0615    |
+|    value_loss           | 74.5       |
+----------------------------------------
+Episode: score=5350, kills=53, best=30500
+Episode: score=14900, kills=149, best=30500
+Episode: score=19250, kills=192, best=30500
+Episode: score=11750, kills=117, best=30500
+Episode: score=14850, kills=148, best=30500
+Episode: score=13150, kills=131, best=30500
+Episode: score=5650, kills=56, best=30500
+✅ Saved at 400,000 steps
+
+============================================================
+🎥 Recording video at 400,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=4900, kills=49, best=30500
+Episode: score=13750, kills=137, best=30500
+Episode: score=6100, kills=61, best=30500
+Episode: score=14250, kills=142, best=30500
+Episode: score=18450, kills=184, best=30500
+Episode: score=9200, kills=92, best=30500
+Episode: score=12650, kills=126, best=30500
+Episode: score=15650, kills=156, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 156         |
+|    episode_score        | 15650       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.25e+03    |
+|    ep_rew_mean          | 1.06e+03    |
+| time/                   |             |
+|    fps                  | 368         |
+|    iterations           | 25          |
+|    time_elapsed         | 1111        |
+|    total_timesteps      | 409600      |
+| train/                  |             |
+|    approx_kl            | 0.045825254 |
+|    clip_fraction        | 0.432       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.55       |
+|    explained_variance   | 0.00318     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 61.8        |
+|    n_updates            | 240         |
+|    policy_gradient_loss | -0.0599     |
+|    value_loss           | 86.4        |
+-----------------------------------------
+Episode: score=6000, kills=60, best=30500
+Episode: score=10300, kills=103, best=30500
+Episode: score=11550, kills=115, best=30500
+Episode: score=2900, kills=29, best=30500
+Episode: score=11800, kills=118, best=30500
+Episode: score=8300, kills=83, best=30500
+Episode: score=14350, kills=143, best=30500
+Episode: score=10950, kills=109, best=30500
+Episode: score=14400, kills=144, best=30500
+Episode: score=5700, kills=57, best=30500
+Episode: score=18050, kills=180, best=30500
+Episode: score=11700, kills=117, best=30500
+Episode: score=7650, kills=76, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 76         |
+|    episode_score        | 7650       |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.23e+03   |
+|    ep_rew_mean          | 1.05e+03   |
+| time/                   |            |
+|    fps                  | 369        |
+|    iterations           | 26         |
+|    time_elapsed         | 1154       |
+|    total_timesteps      | 425984     |
+| train/                  |            |
+|    approx_kl            | 0.04845142 |
+|    clip_fraction        | 0.451      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.52      |
+|    explained_variance   | 0.0495     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 20.7       |
+|    n_updates            | 250        |
+|    policy_gradient_loss | -0.061     |
+|    value_loss           | 86.3       |
+----------------------------------------
+Episode: score=11250, kills=112, best=30500
+Episode: score=10850, kills=108, best=30500
+Episode: score=6700, kills=67, best=30500
+Episode: score=13200, kills=132, best=30500
+Episode: score=11800, kills=118, best=30500
+Episode: score=6750, kills=67, best=30500
+Episode: score=7000, kills=70, best=30500
+Episode: score=5850, kills=58, best=30500
+Episode: score=7750, kills=77, best=30500
+Episode: score=16100, kills=161, best=30500
+Episode: score=4950, kills=49, best=30500
+Episode: score=7600, kills=76, best=30500
+Episode: score=21200, kills=212, best=30500
+Episode: score=16200, kills=162, best=30500
+Episode: score=9200, kills=92, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 92          |
+|    episode_score        | 9200        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.23e+03    |
+|    ep_rew_mean          | 1.07e+03    |
+| time/                   |             |
+|    fps                  | 369         |
+|    iterations           | 27          |
+|    time_elapsed         | 1197        |
+|    total_timesteps      | 442368      |
+| train/                  |             |
+|    approx_kl            | 0.047834847 |
+|    clip_fraction        | 0.447       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.48       |
+|    explained_variance   | 0.0605      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 58.3        |
+|    n_updates            | 260         |
+|    policy_gradient_loss | -0.0619     |
+|    value_loss           | 88          |
+-----------------------------------------
+Episode: score=10150, kills=101, best=30500
+Episode: score=9800, kills=98, best=30500
+Episode: score=11600, kills=116, best=30500
+Episode: score=7450, kills=74, best=30500
+Episode: score=11500, kills=115, best=30500
+Episode: score=9400, kills=94, best=30500
+Episode: score=7000, kills=70, best=30500
+Episode: score=16700, kills=167, best=30500
+Episode: score=5500, kills=55, best=30500
+Episode: score=13800, kills=138, best=30500
+Episode: score=3450, kills=34, best=30500
+Episode: score=24950, kills=249, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 249         |
+|    episode_score        | 24950       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.24e+03    |
+|    ep_rew_mean          | 1.09e+03    |
+| time/                   |             |
+|    fps                  | 369         |
+|    iterations           | 28          |
+|    time_elapsed         | 1240        |
+|    total_timesteps      | 458752      |
+| train/                  |             |
+|    approx_kl            | 0.048943732 |
+|    clip_fraction        | 0.444       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.44       |
+|    explained_variance   | 0.00674     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 48.6        |
+|    n_updates            | 270         |
+|    policy_gradient_loss | -0.0627     |
+|    value_loss           | 91.5        |
+-----------------------------------------
+Episode: score=8450, kills=84, best=30500
+Episode: score=6700, kills=67, best=30500
+Episode: score=22800, kills=228, best=30500
+Episode: score=6400, kills=64, best=30500
+Episode: score=13000, kills=130, best=30500
+Episode: score=16450, kills=164, best=30500
+Episode: score=4700, kills=47, best=30500
+Episode: score=6700, kills=67, best=30500
+Episode: score=8950, kills=89, best=30500
+Episode: score=6450, kills=64, best=30500
+Episode: score=9350, kills=93, best=30500
+Episode: score=9250, kills=92, best=30500
+Episode: score=14450, kills=144, best=30500
+Episode: score=14800, kills=148, best=30500
+Episode: score=11550, kills=115, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 115        |
+|    episode_score        | 11550      |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.19e+03   |
+|    ep_rew_mean          | 1.07e+03   |
+| time/                   |            |
+|    fps                  | 369        |
+|    iterations           | 29         |
+|    time_elapsed         | 1284       |
+|    total_timesteps      | 475136     |
+| train/                  |            |
+|    approx_kl            | 0.05179234 |
+|    clip_fraction        | 0.457      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.42      |
+|    explained_variance   | 0.0523     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 33.9       |
+|    n_updates            | 280        |
+|    policy_gradient_loss | -0.0668    |
+|    value_loss           | 89.1       |
+----------------------------------------
+Episode: score=21350, kills=213, best=30500
+Episode: score=13400, kills=134, best=30500
+Episode: score=13900, kills=139, best=30500
+Episode: score=6600, kills=66, best=30500
+Episode: score=5550, kills=55, best=30500
+Episode: score=11250, kills=112, best=30500
+Episode: score=8150, kills=81, best=30500
+Episode: score=15500, kills=155, best=30500
+Episode: score=16250, kills=162, best=30500
+Episode: score=7050, kills=70, best=30500
+Episode: score=9400, kills=94, best=30500
+Episode: score=13500, kills=135, best=30500
+Episode: score=13650, kills=136, best=30500
+Episode: score=3950, kills=39, best=30500
+Episode: score=6650, kills=66, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 66          |
+|    episode_score        | 6650        |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.18e+03    |
+|    ep_rew_mean          | 1.08e+03    |
+| time/                   |             |
+|    fps                  | 370         |
+|    iterations           | 30          |
+|    time_elapsed         | 1326        |
+|    total_timesteps      | 491520      |
+| train/                  |             |
+|    approx_kl            | 0.050093424 |
+|    clip_fraction        | 0.453       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.38       |
+|    explained_variance   | 0.0519      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 91.3        |
+|    n_updates            | 290         |
+|    policy_gradient_loss | -0.0625     |
+|    value_loss           | 100         |
+-----------------------------------------
+Episode: score=7100, kills=71, best=30500
+Episode: score=5450, kills=54, best=30500
+Episode: score=12000, kills=120, best=30500
+Episode: score=5300, kills=53, best=30500
+Episode: score=15600, kills=156, best=30500
+Episode: score=14700, kills=147, best=30500
+Episode: score=4250, kills=42, best=30500
+Episode: score=12400, kills=124, best=30500
+Episode: score=7800, kills=78, best=30500
+✅ Saved at 500,000 steps
+
+============================================================
+🎥 Recording video at 500,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=8750, kills=87, best=30500
+Episode: score=6850, kills=68, best=30500
+Episode: score=8450, kills=84, best=30500
+Episode: score=19150, kills=191, best=30500
+Episode: score=10700, kills=107, best=30500
+Episode: score=6550, kills=65, best=30500
+Episode: score=14050, kills=140, best=30500
+Episode: score=11250, kills=112, best=30500
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 112         |
+|    episode_score        | 11250       |
+|    highest_score        | 30500       |
+| rollout/                |             |
+|    ep_len_mean          | 1.16e+03    |
+|    ep_rew_mean          | 1.08e+03    |
+| time/                   |             |
+|    fps                  | 370         |
+|    iterations           | 31          |
+|    time_elapsed         | 1369        |
+|    total_timesteps      | 507904      |
+| train/                  |             |
+|    approx_kl            | 0.052171998 |
+|    clip_fraction        | 0.462       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.36       |
+|    explained_variance   | 0.0391      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 44.2        |
+|    n_updates            | 300         |
+|    policy_gradient_loss | -0.0639     |
+|    value_loss           | 97.1        |
+-----------------------------------------
+Episode: score=14700, kills=147, best=30500
+Episode: score=14100, kills=141, best=30500
+Episode: score=15850, kills=158, best=30500
+Episode: score=10100, kills=101, best=30500
+Episode: score=16050, kills=160, best=30500
+Episode: score=12900, kills=129, best=30500
+Episode: score=4700, kills=47, best=30500
+Episode: score=5550, kills=55, best=30500
+Episode: score=12000, kills=120, best=30500
+Episode: score=8000, kills=80, best=30500
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 80         |
+|    episode_score        | 8000       |
+|    highest_score        | 30500      |
+| rollout/                |            |
+|    ep_len_mean          | 1.15e+03   |
+|    ep_rew_mean          | 1.07e+03   |
+| time/                   |            |
+|    fps                  | 371        |
+|    iterations           | 32         |
+|    time_elapsed         | 1412       |
+|    total_timesteps      | 524288     |
+| train/                  |            |
+|    approx_kl            | 0.05211664 |
+|    clip_fraction        | 0.456      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.33      |
+|    explained_variance   | 0.0329     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 46.6       |
+|    n_updates            | 310        |
+|    policy_gradient_loss | -0.0638    |
+|    value_loss           | 104        |
+----------------------------------------
+Episode: score=21450, kills=214, best=30500
+Episode: score=13750, kills=137, best=30500
+Episode: score=9100, kills=91, best=30500
+Episode: score=21200, kills=212, best=30500
+Episode: score=31350, kills=313, best=31350
+Episode: score=6750, kills=67, best=31350
+Episode: score=14000, kills=140, best=31350
+Episode: score=11800, kills=118, best=31350
+Episode: score=7100, kills=71, best=31350
+Episode: score=14750, kills=147, best=31350
+Episode: score=11200, kills=112, best=31350
+Episode: score=10350, kills=103, best=31350
+Episode: score=5600, kills=56, best=31350
+Episode: score=3150, kills=31, best=31350
+Episode: score=2400, kills=24, best=31350
+Episode: score=23050, kills=230, best=31350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 230        |
+|    episode_score        | 23050      |
+|    highest_score        | 31350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.15e+03   |
+|    ep_rew_mean          | 1.11e+03   |
+| time/                   |            |
+|    fps                  | 371        |
+|    iterations           | 33         |
+|    time_elapsed         | 1455       |
+|    total_timesteps      | 540672     |
+| train/                  |            |
+|    approx_kl            | 0.05940499 |
+|    clip_fraction        | 0.485      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.32      |
+|    explained_variance   | 0.0321     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 49.7       |
+|    n_updates            | 320        |
+|    policy_gradient_loss | -0.0694    |
+|    value_loss           | 80.9       |
+----------------------------------------
+Episode: score=7650, kills=76, best=31350
+Episode: score=11250, kills=112, best=31350
+Episode: score=9950, kills=99, best=31350
+Episode: score=2600, kills=26, best=31350
+Episode: score=5900, kills=59, best=31350
+Episode: score=7200, kills=72, best=31350
+Episode: score=11150, kills=111, best=31350
+Episode: score=8600, kills=86, best=31350
+Episode: score=8150, kills=81, best=31350
+Episode: score=26250, kills=262, best=31350
+Episode: score=20000, kills=200, best=31350
+Episode: score=8550, kills=85, best=31350
+Episode: score=3300, kills=33, best=31350
+Episode: score=11250, kills=112, best=31350
+Episode: score=2200, kills=22, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 22          |
+|    episode_score        | 2200        |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.12e+03    |
+|    ep_rew_mean          | 1.09e+03    |
+| time/                   |             |
+|    fps                  | 371         |
+|    iterations           | 34          |
+|    time_elapsed         | 1499        |
+|    total_timesteps      | 557056      |
+| train/                  |             |
+|    approx_kl            | 0.055916853 |
+|    clip_fraction        | 0.462       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.28       |
+|    explained_variance   | -0.0031     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 36.4        |
+|    n_updates            | 330         |
+|    policy_gradient_loss | -0.0645     |
+|    value_loss           | 105         |
+-----------------------------------------
+Episode: score=6450, kills=64, best=31350
+Episode: score=14400, kills=144, best=31350
+Episode: score=17000, kills=170, best=31350
+Episode: score=10800, kills=108, best=31350
+Episode: score=11700, kills=117, best=31350
+Episode: score=12700, kills=127, best=31350
+Episode: score=4250, kills=42, best=31350
+Episode: score=14200, kills=142, best=31350
+Episode: score=7700, kills=77, best=31350
+Episode: score=6750, kills=67, best=31350
+Episode: score=18850, kills=188, best=31350
+Episode: score=12200, kills=122, best=31350
+Episode: score=9150, kills=91, best=31350
+Episode: score=7200, kills=72, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 72          |
+|    episode_score        | 7200        |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.12e+03    |
+|    ep_rew_mean          | 1.1e+03     |
+| time/                   |             |
+|    fps                  | 371         |
+|    iterations           | 35          |
+|    time_elapsed         | 1542        |
+|    total_timesteps      | 573440      |
+| train/                  |             |
+|    approx_kl            | 0.056480616 |
+|    clip_fraction        | 0.47        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.26       |
+|    explained_variance   | -0.00842    |
+|    learning_rate        | 0.0003      |
+|    loss                 | 29.8        |
+|    n_updates            | 340         |
+|    policy_gradient_loss | -0.065      |
+|    value_loss           | 106         |
+-----------------------------------------
+Episode: score=16500, kills=165, best=31350
+Episode: score=16950, kills=169, best=31350
+Episode: score=14500, kills=145, best=31350
+Episode: score=16600, kills=166, best=31350
+Episode: score=15150, kills=151, best=31350
+Episode: score=10100, kills=101, best=31350
+Episode: score=6100, kills=61, best=31350
+Episode: score=8600, kills=86, best=31350
+Episode: score=15650, kills=156, best=31350
+Episode: score=12100, kills=121, best=31350
+Episode: score=13500, kills=135, best=31350
+Episode: score=19200, kills=192, best=31350
+Episode: score=14750, kills=147, best=31350
+Episode: score=9700, kills=97, best=31350
+Episode: score=11200, kills=112, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 112         |
+|    episode_score        | 11200       |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.13e+03    |
+|    ep_rew_mean          | 1.12e+03    |
+| time/                   |             |
+|    fps                  | 371         |
+|    iterations           | 36          |
+|    time_elapsed         | 1585        |
+|    total_timesteps      | 589824      |
+| train/                  |             |
+|    approx_kl            | 0.061088555 |
+|    clip_fraction        | 0.486       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.23       |
+|    explained_variance   | -0.00885    |
+|    learning_rate        | 0.0003      |
+|    loss                 | 23.6        |
+|    n_updates            | 350         |
+|    policy_gradient_loss | -0.0688     |
+|    value_loss           | 102         |
+-----------------------------------------
+Episode: score=4950, kills=49, best=31350
+Episode: score=12100, kills=121, best=31350
+Episode: score=8500, kills=85, best=31350
+Episode: score=10400, kills=104, best=31350
+Episode: score=9000, kills=90, best=31350
+Episode: score=18400, kills=184, best=31350
+Episode: score=3550, kills=35, best=31350
+Episode: score=13050, kills=130, best=31350
+✅ Saved at 600,000 steps
+
+============================================================
+🎥 Recording video at 600,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=21350, kills=213, best=31350
+Episode: score=5500, kills=55, best=31350
+Episode: score=9300, kills=93, best=31350
+Episode: score=15450, kills=154, best=31350
+Episode: score=16400, kills=164, best=31350
+Episode: score=15100, kills=151, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 151         |
+|    episode_score        | 15100       |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.15e+03    |
+|    ep_rew_mean          | 1.15e+03    |
+| time/                   |             |
+|    fps                  | 372         |
+|    iterations           | 37          |
+|    time_elapsed         | 1629        |
+|    total_timesteps      | 606208      |
+| train/                  |             |
+|    approx_kl            | 0.057417482 |
+|    clip_fraction        | 0.482       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.22       |
+|    explained_variance   | 0.0398      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 39.9        |
+|    n_updates            | 360         |
+|    policy_gradient_loss | -0.0655     |
+|    value_loss           | 113         |
+-----------------------------------------
+Episode: score=9050, kills=90, best=31350
+Episode: score=13300, kills=133, best=31350
+Episode: score=17900, kills=179, best=31350
+Episode: score=10900, kills=109, best=31350
+Episode: score=12700, kills=127, best=31350
+Episode: score=8950, kills=89, best=31350
+Episode: score=13650, kills=136, best=31350
+Episode: score=13500, kills=135, best=31350
+Episode: score=5000, kills=50, best=31350
+Episode: score=14600, kills=146, best=31350
+Episode: score=9650, kills=96, best=31350
+Episode: score=15200, kills=152, best=31350
+Episode: score=12400, kills=124, best=31350
+Episode: score=18100, kills=181, best=31350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 181        |
+|    episode_score        | 18100      |
+|    highest_score        | 31350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.17e+03   |
+|    ep_rew_mean          | 1.18e+03   |
+| time/                   |            |
+|    fps                  | 372        |
+|    iterations           | 38         |
+|    time_elapsed         | 1672       |
+|    total_timesteps      | 622592     |
+| train/                  |            |
+|    approx_kl            | 0.06038162 |
+|    clip_fraction        | 0.481      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.2       |
+|    explained_variance   | 0.0545     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 54.1       |
+|    n_updates            | 370        |
+|    policy_gradient_loss | -0.0666    |
+|    value_loss           | 104        |
+----------------------------------------
+Episode: score=15700, kills=157, best=31350
+Episode: score=14050, kills=140, best=31350
+Episode: score=3400, kills=34, best=31350
+Episode: score=9000, kills=90, best=31350
+Episode: score=5350, kills=53, best=31350
+Episode: score=15500, kills=155, best=31350
+Episode: score=12000, kills=120, best=31350
+Episode: score=7950, kills=79, best=31350
+Episode: score=17300, kills=173, best=31350
+Episode: score=12500, kills=125, best=31350
+Episode: score=12750, kills=127, best=31350
+Episode: score=19800, kills=198, best=31350
+Episode: score=8750, kills=87, best=31350
+Episode: score=12700, kills=127, best=31350
+Episode: score=17800, kills=178, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 178         |
+|    episode_score        | 17800       |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.16e+03    |
+|    ep_rew_mean          | 1.18e+03    |
+| time/                   |             |
+|    fps                  | 372         |
+|    iterations           | 39          |
+|    time_elapsed         | 1715        |
+|    total_timesteps      | 638976      |
+| train/                  |             |
+|    approx_kl            | 0.061481126 |
+|    clip_fraction        | 0.484       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.18       |
+|    explained_variance   | 0.0465      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 103         |
+|    n_updates            | 380         |
+|    policy_gradient_loss | -0.0678     |
+|    value_loss           | 111         |
+-----------------------------------------
+Episode: score=14450, kills=144, best=31350
+Episode: score=13100, kills=131, best=31350
+Episode: score=7750, kills=77, best=31350
+Episode: score=15550, kills=155, best=31350
+Episode: score=9100, kills=91, best=31350
+Episode: score=15050, kills=150, best=31350
+Episode: score=11600, kills=116, best=31350
+Episode: score=10000, kills=100, best=31350
+Episode: score=8500, kills=85, best=31350
+Episode: score=6600, kills=66, best=31350
+Episode: score=17800, kills=178, best=31350
+Episode: score=17700, kills=177, best=31350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 177         |
+|    episode_score        | 17700       |
+|    highest_score        | 31350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.16e+03    |
+|    ep_rew_mean          | 1.19e+03    |
+| time/                   |             |
+|    fps                  | 372         |
+|    iterations           | 40          |
+|    time_elapsed         | 1758        |
+|    total_timesteps      | 655360      |
+| train/                  |             |
+|    approx_kl            | 0.063109264 |
+|    clip_fraction        | 0.488       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.15       |
+|    explained_variance   | 0.00485     |
+|    learning_rate        | 0.0003      |
+|    loss                 | 42          |
+|    n_updates            | 390         |
+|    policy_gradient_loss | -0.0662     |
+|    value_loss           | 109         |
+-----------------------------------------
+Episode: score=5100, kills=51, best=31350
+Episode: score=13100, kills=131, best=31350
+Episode: score=12550, kills=125, best=31350
+Episode: score=18350, kills=183, best=31350
+Episode: score=11150, kills=111, best=31350
+Episode: score=11700, kills=117, best=31350
+Episode: score=16450, kills=164, best=31350
+Episode: score=10450, kills=104, best=31350
+Episode: score=34250, kills=342, best=34250
+Episode: score=15000, kills=150, best=34250
+Episode: score=8200, kills=82, best=34250
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 82          |
+|    episode_score        | 8200        |
+|    highest_score        | 34250       |
+| rollout/                |             |
+|    ep_len_mean          | 1.18e+03    |
+|    ep_rew_mean          | 1.23e+03    |
+| time/                   |             |
+|    fps                  | 372         |
+|    iterations           | 41          |
+|    time_elapsed         | 1801        |
+|    total_timesteps      | 671744      |
+| train/                  |             |
+|    approx_kl            | 0.065170005 |
+|    clip_fraction        | 0.5         |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.11       |
+|    explained_variance   | 0.0189      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 26.4        |
+|    n_updates            | 400         |
+|    policy_gradient_loss | -0.0696     |
+|    value_loss           | 99.1        |
+-----------------------------------------
+Episode: score=17100, kills=171, best=34250
+Episode: score=13400, kills=134, best=34250
+Episode: score=21450, kills=214, best=34250
+Episode: score=16300, kills=163, best=34250
+Episode: score=8400, kills=84, best=34250
+Episode: score=2900, kills=29, best=34250
+Episode: score=11750, kills=117, best=34250
+Episode: score=8900, kills=89, best=34250
+Episode: score=11950, kills=119, best=34250
+Episode: score=14800, kills=148, best=34250
+Episode: score=27500, kills=275, best=34250
+Episode: score=9100, kills=91, best=34250
+Episode: score=4950, kills=49, best=34250
+Episode: score=4900, kills=49, best=34250
+Episode: score=17050, kills=170, best=34250
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 170        |
+|    episode_score        | 17050      |
+|    highest_score        | 34250      |
+| rollout/                |            |
+|    ep_len_mean          | 1.21e+03   |
+|    ep_rew_mean          | 1.26e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 42         |
+|    time_elapsed         | 1844       |
+|    total_timesteps      | 688128     |
+| train/                  |            |
+|    approx_kl            | 0.06737132 |
+|    clip_fraction        | 0.501      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.09      |
+|    explained_variance   | 0.00264    |
+|    learning_rate        | 0.0003     |
+|    loss                 | 22.1       |
+|    n_updates            | 410        |
+|    policy_gradient_loss | -0.0693    |
+|    value_loss           | 101        |
+----------------------------------------
+Episode: score=5850, kills=58, best=34250
+Episode: score=11850, kills=118, best=34250
+Episode: score=9950, kills=99, best=34250
+Episode: score=13500, kills=135, best=34250
+Episode: score=10100, kills=101, best=34250
+Episode: score=20200, kills=202, best=34250
+Episode: score=7550, kills=75, best=34250
+Episode: score=7500, kills=75, best=34250
+Episode: score=17650, kills=176, best=34250
+Episode: score=15000, kills=150, best=34250
+✅ Saved at 700,000 steps
+
+============================================================
+🎥 Recording video at 700,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=24950, kills=249, best=34250
+Episode: score=9100, kills=91, best=34250
+Episode: score=12800, kills=128, best=34250
+Episode: score=2900, kills=29, best=34250
+---------------------------------------
+| robotron/               |           |
+|    episode_kills        | 29        |
+|    episode_score        | 2900      |
+|    highest_score        | 34250     |
+| rollout/                |           |
+|    ep_len_mean          | 1.19e+03  |
+|    ep_rew_mean          | 1.25e+03  |
+| time/                   |           |
+|    fps                  | 373       |
+|    iterations           | 43        |
+|    time_elapsed         | 1888      |
+|    total_timesteps      | 704512    |
+| train/                  |           |
+|    approx_kl            | 0.0652977 |
+|    clip_fraction        | 0.488     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -3.06     |
+|    explained_variance   | 0.0135    |
+|    learning_rate        | 0.0003    |
+|    loss                 | 15.5      |
+|    n_updates            | 420       |
+|    policy_gradient_loss | -0.0661   |
+|    value_loss           | 112       |
+---------------------------------------
+Episode: score=12400, kills=124, best=34250
+Episode: score=15300, kills=153, best=34250
+Episode: score=13350, kills=133, best=34250
+Episode: score=13300, kills=133, best=34250
+Episode: score=11850, kills=118, best=34250
+Episode: score=7150, kills=71, best=34250
+Episode: score=4800, kills=48, best=34250
+Episode: score=13350, kills=133, best=34250
+Episode: score=13800, kills=138, best=34250
+Episode: score=9750, kills=97, best=34250
+Episode: score=23600, kills=236, best=34250
+Episode: score=12100, kills=121, best=34250
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 121        |
+|    episode_score        | 12100      |
+|    highest_score        | 34250      |
+| rollout/                |            |
+|    ep_len_mean          | 1.2e+03    |
+|    ep_rew_mean          | 1.27e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 44         |
+|    time_elapsed         | 1931       |
+|    total_timesteps      | 720896     |
+| train/                  |            |
+|    approx_kl            | 0.06489079 |
+|    clip_fraction        | 0.494      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3.04      |
+|    explained_variance   | 0.0339     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 30.6       |
+|    n_updates            | 430        |
+|    policy_gradient_loss | -0.0674    |
+|    value_loss           | 114        |
+----------------------------------------
+Episode: score=29300, kills=293, best=34250
+Episode: score=20600, kills=206, best=34250
+Episode: score=16150, kills=161, best=34250
+Episode: score=11650, kills=116, best=34250
+Episode: score=13400, kills=134, best=34250
+Episode: score=9150, kills=91, best=34250
+Episode: score=15750, kills=157, best=34250
+Episode: score=8800, kills=88, best=34250
+Episode: score=7000, kills=70, best=34250
+Episode: score=16050, kills=160, best=34250
+Episode: score=10950, kills=109, best=34250
+Episode: score=16650, kills=166, best=34250
+Episode: score=12650, kills=126, best=34250
+Episode: score=9800, kills=98, best=34250
+Episode: score=9900, kills=99, best=34250
+Episode: score=5850, kills=58, best=34250
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 58          |
+|    episode_score        | 5850        |
+|    highest_score        | 34250       |
+| rollout/                |             |
+|    ep_len_mean          | 1.21e+03    |
+|    ep_rew_mean          | 1.28e+03    |
+| time/                   |             |
+|    fps                  | 373         |
+|    iterations           | 45          |
+|    time_elapsed         | 1974        |
+|    total_timesteps      | 737280      |
+| train/                  |             |
+|    approx_kl            | 0.068131015 |
+|    clip_fraction        | 0.501       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -3.02       |
+|    explained_variance   | 0.0307      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 26.6        |
+|    n_updates            | 440         |
+|    policy_gradient_loss | -0.0673     |
+|    value_loss           | 100         |
+-----------------------------------------
+Episode: score=9200, kills=92, best=34250
+Episode: score=4450, kills=44, best=34250
+Episode: score=7950, kills=79, best=34250
+Episode: score=18950, kills=189, best=34250
+Episode: score=7800, kills=78, best=34250
+Episode: score=12400, kills=124, best=34250
+Episode: score=15500, kills=155, best=34250
+Episode: score=5600, kills=56, best=34250
+Episode: score=7050, kills=70, best=34250
+Episode: score=5550, kills=55, best=34250
+Episode: score=11850, kills=118, best=34250
+Episode: score=5000, kills=50, best=34250
+Episode: score=15650, kills=156, best=34250
+Episode: score=1100, kills=11, best=34250
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 11         |
+|    episode_score        | 1100       |
+|    highest_score        | 34250      |
+| rollout/                |            |
+|    ep_len_mean          | 1.17e+03   |
+|    ep_rew_mean          | 1.24e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 46         |
+|    time_elapsed         | 2017       |
+|    total_timesteps      | 753664     |
+| train/                  |            |
+|    approx_kl            | 0.06373831 |
+|    clip_fraction        | 0.491      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -3         |
+|    explained_variance   | 0.0221     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 78.5       |
+|    n_updates            | 450        |
+|    policy_gradient_loss | -0.0664    |
+|    value_loss           | 116        |
+----------------------------------------
+Episode: score=15150, kills=151, best=34250
+Episode: score=15650, kills=156, best=34250
+Episode: score=9700, kills=97, best=34250
+Episode: score=11100, kills=111, best=34250
+Episode: score=13300, kills=133, best=34250
+Episode: score=18500, kills=185, best=34250
+Episode: score=39650, kills=396, best=39650
+Episode: score=12950, kills=129, best=39650
+Episode: score=10800, kills=108, best=39650
+Episode: score=9750, kills=97, best=39650
+Episode: score=13100, kills=131, best=39650
+Episode: score=17250, kills=172, best=39650
+Episode: score=10800, kills=108, best=39650
+Episode: score=10050, kills=100, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 100        |
+|    episode_score        | 10050      |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.19e+03   |
+|    ep_rew_mean          | 1.27e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 47         |
+|    time_elapsed         | 2060       |
+|    total_timesteps      | 770048     |
+| train/                  |            |
+|    approx_kl            | 0.06937595 |
+|    clip_fraction        | 0.51       |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.99      |
+|    explained_variance   | -0.000869  |
+|    learning_rate        | 0.0003     |
+|    loss                 | 144        |
+|    n_updates            | 460        |
+|    policy_gradient_loss | -0.0655    |
+|    value_loss           | 107        |
+----------------------------------------
+Episode: score=21400, kills=214, best=39650
+Episode: score=8950, kills=89, best=39650
+Episode: score=11150, kills=111, best=39650
+Episode: score=19750, kills=197, best=39650
+Episode: score=12550, kills=125, best=39650
+Episode: score=23100, kills=231, best=39650
+Episode: score=6450, kills=64, best=39650
+Episode: score=7050, kills=70, best=39650
+Episode: score=17250, kills=172, best=39650
+Episode: score=27300, kills=273, best=39650
+Episode: score=12550, kills=125, best=39650
+Episode: score=15450, kills=154, best=39650
+Episode: score=9250, kills=92, best=39650
+Episode: score=11450, kills=114, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 114        |
+|    episode_score        | 11450      |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.19e+03   |
+|    ep_rew_mean          | 1.27e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 48         |
+|    time_elapsed         | 2104       |
+|    total_timesteps      | 786432     |
+| train/                  |            |
+|    approx_kl            | 0.06543112 |
+|    clip_fraction        | 0.492      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.96      |
+|    explained_variance   | 0.00168    |
+|    learning_rate        | 0.0003     |
+|    loss                 | 26.2       |
+|    n_updates            | 470        |
+|    policy_gradient_loss | -0.0681    |
+|    value_loss           | 121        |
+----------------------------------------
+Episode: score=16000, kills=160, best=39650
+Episode: score=12000, kills=120, best=39650
+Episode: score=7650, kills=76, best=39650
+Episode: score=6350, kills=63, best=39650
+Episode: score=20350, kills=203, best=39650
+Episode: score=12650, kills=126, best=39650
+Episode: score=9600, kills=96, best=39650
+Episode: score=4300, kills=43, best=39650
+Episode: score=17150, kills=171, best=39650
+Episode: score=13750, kills=137, best=39650
+Episode: score=18750, kills=187, best=39650
+Episode: score=7650, kills=76, best=39650
+✅ Saved at 800,000 steps
+
+============================================================
+🎥 Recording video at 800,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=3700, kills=37, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 37         |
+|    episode_score        | 3700       |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.16e+03   |
+|    ep_rew_mean          | 1.25e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 49         |
+|    time_elapsed         | 2147       |
+|    total_timesteps      | 802816     |
+| train/                  |            |
+|    approx_kl            | 0.07241692 |
+|    clip_fraction        | 0.512      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.95      |
+|    explained_variance   | 0.00855    |
+|    learning_rate        | 0.0003     |
+|    loss                 | 29.3       |
+|    n_updates            | 480        |
+|    policy_gradient_loss | -0.0688    |
+|    value_loss           | 111        |
+----------------------------------------
+Episode: score=15850, kills=158, best=39650
+Episode: score=12850, kills=128, best=39650
+Episode: score=28200, kills=282, best=39650
+Episode: score=11950, kills=119, best=39650
+Episode: score=19650, kills=196, best=39650
+Episode: score=10650, kills=106, best=39650
+Episode: score=3950, kills=39, best=39650
+Episode: score=17700, kills=177, best=39650
+Episode: score=19500, kills=195, best=39650
+Episode: score=6150, kills=61, best=39650
+Episode: score=5600, kills=56, best=39650
+Episode: score=11250, kills=112, best=39650
+Episode: score=13800, kills=138, best=39650
+Episode: score=14300, kills=143, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 143        |
+|    episode_score        | 14300      |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.17e+03   |
+|    ep_rew_mean          | 1.27e+03   |
+| time/                   |            |
+|    fps                  | 373        |
+|    iterations           | 50         |
+|    time_elapsed         | 2190       |
+|    total_timesteps      | 819200     |
+| train/                  |            |
+|    approx_kl            | 0.06975609 |
+|    clip_fraction        | 0.505      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.92      |
+|    explained_variance   | 0.0156     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 49.8       |
+|    n_updates            | 490        |
+|    policy_gradient_loss | -0.0708    |
+|    value_loss           | 111        |
+----------------------------------------
+Episode: score=9700, kills=97, best=39650
+Episode: score=16700, kills=167, best=39650
+Episode: score=14800, kills=148, best=39650
+Episode: score=19450, kills=194, best=39650
+Episode: score=19400, kills=194, best=39650
+Episode: score=23700, kills=237, best=39650
+Episode: score=17800, kills=178, best=39650
+Episode: score=8750, kills=87, best=39650
+Episode: score=36950, kills=369, best=39650
+Episode: score=16200, kills=162, best=39650
+Episode: score=17050, kills=170, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 170        |
+|    episode_score        | 17050      |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.23e+03   |
+|    ep_rew_mean          | 1.35e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 51         |
+|    time_elapsed         | 2233       |
+|    total_timesteps      | 835584     |
+| train/                  |            |
+|    approx_kl            | 0.06880523 |
+|    clip_fraction        | 0.503      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.89      |
+|    explained_variance   | 0.0576     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 34.5       |
+|    n_updates            | 500        |
+|    policy_gradient_loss | -0.0674    |
+|    value_loss           | 119        |
+----------------------------------------
+Episode: score=11800, kills=118, best=39650
+Episode: score=11100, kills=111, best=39650
+Episode: score=10700, kills=107, best=39650
+Episode: score=14000, kills=140, best=39650
+Episode: score=12750, kills=127, best=39650
+Episode: score=11550, kills=115, best=39650
+Episode: score=20050, kills=200, best=39650
+Episode: score=8750, kills=87, best=39650
+Episode: score=9000, kills=90, best=39650
+Episode: score=12100, kills=121, best=39650
+Episode: score=14300, kills=143, best=39650
+Episode: score=16350, kills=163, best=39650
+Episode: score=4200, kills=42, best=39650
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 42         |
+|    episode_score        | 4200       |
+|    highest_score        | 39650      |
+| rollout/                |            |
+|    ep_len_mean          | 1.19e+03   |
+|    ep_rew_mean          | 1.32e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 52         |
+|    time_elapsed         | 2277       |
+|    total_timesteps      | 851968     |
+| train/                  |            |
+|    approx_kl            | 0.06947375 |
+|    clip_fraction        | 0.504      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.87      |
+|    explained_variance   | 0.02       |
+|    learning_rate        | 0.0003     |
+|    loss                 | 26.3       |
+|    n_updates            | 510        |
+|    policy_gradient_loss | -0.0696    |
+|    value_loss           | 116        |
+----------------------------------------
+Episode: score=8650, kills=86, best=39650
+Episode: score=17500, kills=175, best=39650
+Episode: score=17050, kills=170, best=39650
+Episode: score=45350, kills=453, best=45350
+Episode: score=21900, kills=219, best=45350
+Episode: score=20050, kills=200, best=45350
+Episode: score=16100, kills=161, best=45350
+Episode: score=15750, kills=157, best=45350
+Episode: score=7950, kills=79, best=45350
+Episode: score=7950, kills=79, best=45350
+Episode: score=10350, kills=103, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 103        |
+|    episode_score        | 10350      |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.24e+03   |
+|    ep_rew_mean          | 1.39e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 53         |
+|    time_elapsed         | 2320       |
+|    total_timesteps      | 868352     |
+| train/                  |            |
+|    approx_kl            | 0.07358619 |
+|    clip_fraction        | 0.51       |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.84      |
+|    explained_variance   | 0.00452    |
+|    learning_rate        | 0.0003     |
+|    loss                 | 117        |
+|    n_updates            | 520        |
+|    policy_gradient_loss | -0.0689    |
+|    value_loss           | 116        |
+----------------------------------------
+Episode: score=12100, kills=121, best=45350
+Episode: score=36100, kills=361, best=45350
+Episode: score=20600, kills=206, best=45350
+Episode: score=8050, kills=80, best=45350
+Episode: score=13400, kills=134, best=45350
+Episode: score=7900, kills=79, best=45350
+Episode: score=10900, kills=109, best=45350
+Episode: score=16050, kills=160, best=45350
+Episode: score=16250, kills=162, best=45350
+Episode: score=10300, kills=103, best=45350
+Episode: score=31050, kills=310, best=45350
+Episode: score=8100, kills=81, best=45350
+Episode: score=18950, kills=189, best=45350
+Episode: score=10000, kills=100, best=45350
+Episode: score=15650, kills=156, best=45350
+---------------------------------------
+| robotron/               |           |
+|    episode_kills        | 156       |
+|    episode_score        | 15650     |
+|    highest_score        | 45350     |
+| rollout/                |           |
+|    ep_len_mean          | 1.3e+03   |
+|    ep_rew_mean          | 1.47e+03  |
+| time/                   |           |
+|    fps                  | 374       |
+|    iterations           | 54        |
+|    time_elapsed         | 2363      |
+|    total_timesteps      | 884736    |
+| train/                  |           |
+|    approx_kl            | 0.076333  |
+|    clip_fraction        | 0.512     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -2.86     |
+|    explained_variance   | -0.000794 |
+|    learning_rate        | 0.0003    |
+|    loss                 | 37.8      |
+|    n_updates            | 530       |
+|    policy_gradient_loss | -0.0728   |
+|    value_loss           | 104       |
+---------------------------------------
+Episode: score=6700, kills=67, best=45350
+Episode: score=11550, kills=115, best=45350
+Episode: score=14500, kills=145, best=45350
+Episode: score=12050, kills=120, best=45350
+Episode: score=4950, kills=49, best=45350
+Episode: score=10650, kills=106, best=45350
+Episode: score=13150, kills=131, best=45350
+Episode: score=12950, kills=129, best=45350
+Episode: score=8850, kills=88, best=45350
+Episode: score=15750, kills=157, best=45350
+Episode: score=19550, kills=195, best=45350
+Episode: score=13300, kills=133, best=45350
+Episode: score=17100, kills=171, best=45350
+✅ Saved at 900,000 steps
+
+============================================================
+🎥 Recording video at 900,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=7000, kills=70, best=45350
+Episode: score=16400, kills=164, best=45350
+Episode: score=12100, kills=121, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 121        |
+|    episode_score        | 12100      |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.25e+03   |
+|    ep_rew_mean          | 1.42e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 55         |
+|    time_elapsed         | 2407       |
+|    total_timesteps      | 901120     |
+| train/                  |            |
+|    approx_kl            | 0.07072021 |
+|    clip_fraction        | 0.499      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.83      |
+|    explained_variance   | 0.0372     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 16.9       |
+|    n_updates            | 540        |
+|    policy_gradient_loss | -0.067     |
+|    value_loss           | 131        |
+----------------------------------------
+Episode: score=6950, kills=69, best=45350
+Episode: score=9700, kills=97, best=45350
+Episode: score=24300, kills=243, best=45350
+Episode: score=10350, kills=103, best=45350
+Episode: score=7500, kills=75, best=45350
+Episode: score=12350, kills=123, best=45350
+Episode: score=8950, kills=89, best=45350
+Episode: score=16500, kills=165, best=45350
+Episode: score=7000, kills=70, best=45350
+Episode: score=11600, kills=116, best=45350
+Episode: score=21250, kills=212, best=45350
+Episode: score=30450, kills=304, best=45350
+Episode: score=11050, kills=110, best=45350
+---------------------------------------
+| robotron/               |           |
+|    episode_kills        | 110       |
+|    episode_score        | 11050     |
+|    highest_score        | 45350     |
+| rollout/                |           |
+|    ep_len_mean          | 1.25e+03  |
+|    ep_rew_mean          | 1.42e+03  |
+| time/                   |           |
+|    fps                  | 374       |
+|    iterations           | 56        |
+|    time_elapsed         | 2450      |
+|    total_timesteps      | 917504    |
+| train/                  |           |
+|    approx_kl            | 0.0697054 |
+|    clip_fraction        | 0.503     |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -2.83     |
+|    explained_variance   | 0.0582    |
+|    learning_rate        | 0.0003    |
+|    loss                 | 36.3      |
+|    n_updates            | 550       |
+|    policy_gradient_loss | -0.0678   |
+|    value_loss           | 139       |
+---------------------------------------
+Episode: score=7900, kills=79, best=45350
+Episode: score=18650, kills=186, best=45350
+Episode: score=9650, kills=96, best=45350
+Episode: score=17800, kills=178, best=45350
+Episode: score=7550, kills=75, best=45350
+Episode: score=23050, kills=230, best=45350
+Episode: score=13700, kills=137, best=45350
+Episode: score=16000, kills=160, best=45350
+Episode: score=7250, kills=72, best=45350
+Episode: score=12550, kills=125, best=45350
+Episode: score=9650, kills=96, best=45350
+Episode: score=27350, kills=273, best=45350
+Episode: score=14800, kills=148, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 148        |
+|    episode_score        | 14800      |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.25e+03   |
+|    ep_rew_mean          | 1.43e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 57         |
+|    time_elapsed         | 2493       |
+|    total_timesteps      | 933888     |
+| train/                  |            |
+|    approx_kl            | 0.07608932 |
+|    clip_fraction        | 0.521      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.79      |
+|    explained_variance   | 0.0603     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 72         |
+|    n_updates            | 560        |
+|    policy_gradient_loss | -0.07      |
+|    value_loss           | 122        |
+----------------------------------------
+Episode: score=12000, kills=120, best=45350
+Episode: score=19350, kills=193, best=45350
+Episode: score=5800, kills=58, best=45350
+Episode: score=19950, kills=199, best=45350
+Episode: score=12500, kills=125, best=45350
+Episode: score=10000, kills=100, best=45350
+Episode: score=3400, kills=34, best=45350
+Episode: score=13750, kills=137, best=45350
+Episode: score=14600, kills=146, best=45350
+Episode: score=12400, kills=124, best=45350
+Episode: score=20050, kills=200, best=45350
+Episode: score=10450, kills=104, best=45350
+Episode: score=3750, kills=37, best=45350
+Episode: score=8850, kills=88, best=45350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 88          |
+|    episode_score        | 8850        |
+|    highest_score        | 45350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.22e+03    |
+|    ep_rew_mean          | 1.4e+03     |
+| time/                   |             |
+|    fps                  | 374         |
+|    iterations           | 58          |
+|    time_elapsed         | 2536        |
+|    total_timesteps      | 950272      |
+| train/                  |             |
+|    approx_kl            | 0.074992806 |
+|    clip_fraction        | 0.516       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.79       |
+|    explained_variance   | 0.0237      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 25.3        |
+|    n_updates            | 570         |
+|    policy_gradient_loss | -0.0695     |
+|    value_loss           | 131         |
+-----------------------------------------
+Episode: score=30050, kills=300, best=45350
+Episode: score=6150, kills=61, best=45350
+Episode: score=2000, kills=20, best=45350
+Episode: score=11350, kills=113, best=45350
+Episode: score=10650, kills=106, best=45350
+Episode: score=20200, kills=202, best=45350
+Episode: score=15050, kills=150, best=45350
+Episode: score=9100, kills=91, best=45350
+Episode: score=6500, kills=65, best=45350
+Episode: score=10550, kills=105, best=45350
+Episode: score=13900, kills=139, best=45350
+Episode: score=20400, kills=204, best=45350
+Episode: score=8700, kills=87, best=45350
+Episode: score=13600, kills=136, best=45350
+Episode: score=9150, kills=91, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 91         |
+|    episode_score        | 9150       |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.2e+03    |
+|    ep_rew_mean          | 1.37e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 59         |
+|    time_elapsed         | 2579       |
+|    total_timesteps      | 966656     |
+| train/                  |            |
+|    approx_kl            | 0.07352817 |
+|    clip_fraction        | 0.51       |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.78      |
+|    explained_variance   | 0.0437     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 60.8       |
+|    n_updates            | 580        |
+|    policy_gradient_loss | -0.0691    |
+|    value_loss           | 130        |
+----------------------------------------
+Episode: score=29050, kills=290, best=45350
+Episode: score=4600, kills=46, best=45350
+Episode: score=10300, kills=103, best=45350
+Episode: score=12850, kills=128, best=45350
+Episode: score=17900, kills=179, best=45350
+Episode: score=16450, kills=164, best=45350
+Episode: score=9550, kills=95, best=45350
+Episode: score=8550, kills=85, best=45350
+Episode: score=12550, kills=125, best=45350
+Episode: score=22300, kills=223, best=45350
+Episode: score=16450, kills=164, best=45350
+Episode: score=12200, kills=122, best=45350
+Episode: score=12300, kills=123, best=45350
+Episode: score=7050, kills=70, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 70         |
+|    episode_score        | 7050       |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.16e+03   |
+|    ep_rew_mean          | 1.34e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 60         |
+|    time_elapsed         | 2622       |
+|    total_timesteps      | 983040     |
+| train/                  |            |
+|    approx_kl            | 0.07233512 |
+|    clip_fraction        | 0.511      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.77      |
+|    explained_variance   | -0.00803   |
+|    learning_rate        | 0.0003     |
+|    loss                 | 69.1       |
+|    n_updates            | 590        |
+|    policy_gradient_loss | -0.0668    |
+|    value_loss           | 140        |
+----------------------------------------
+Episode: score=15650, kills=156, best=45350
+Episode: score=17950, kills=179, best=45350
+Episode: score=22400, kills=224, best=45350
+Episode: score=17050, kills=170, best=45350
+Episode: score=14050, kills=140, best=45350
+Episode: score=7450, kills=74, best=45350
+Episode: score=8950, kills=89, best=45350
+Episode: score=11950, kills=119, best=45350
+Episode: score=10200, kills=102, best=45350
+Episode: score=6450, kills=64, best=45350
+Episode: score=12150, kills=121, best=45350
+Episode: score=10100, kills=101, best=45350
+Episode: score=9200, kills=92, best=45350
+Episode: score=17300, kills=173, best=45350
+Episode: score=12150, kills=121, best=45350
+Episode: score=11850, kills=118, best=45350
+Episode: score=5900, kills=59, best=45350
+Episode: score=10400, kills=104, best=45350
+-----------------------------------------
+| robotron/               |             |
+|    episode_kills        | 104         |
+|    episode_score        | 10400       |
+|    highest_score        | 45350       |
+| rollout/                |             |
+|    ep_len_mean          | 1.12e+03    |
+|    ep_rew_mean          | 1.3e+03     |
+| time/                   |             |
+|    fps                  | 374         |
+|    iterations           | 61          |
+|    time_elapsed         | 2666        |
+|    total_timesteps      | 999424      |
+| train/                  |             |
+|    approx_kl            | 0.077017725 |
+|    clip_fraction        | 0.521       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -2.73       |
+|    explained_variance   | 0.0311      |
+|    learning_rate        | 0.0003      |
+|    loss                 | 33.2        |
+|    n_updates            | 600         |
+|    policy_gradient_loss | -0.0684     |
+|    value_loss           | 128         |
+-----------------------------------------
+✅ Saved at 1,000,000 steps
+
+============================================================
+🎥 Recording video at 1,000,000 steps...
+============================================================
+⚠️  Video recording failed: Error: Unexpected observation shape (4, 84, 84) for Box environment, please use (222,) or (n_env, 222) for the observation shape.
+============================================================
+
+Episode: score=14550, kills=145, best=45350
+Episode: score=17350, kills=173, best=45350
+Episode: score=15950, kills=159, best=45350
+Episode: score=18950, kills=189, best=45350
+Episode: score=19700, kills=197, best=45350
+Episode: score=16100, kills=161, best=45350
+Episode: score=16600, kills=166, best=45350
+Episode: score=20500, kills=205, best=45350
+Episode: score=7000, kills=70, best=45350
+----------------------------------------
+| robotron/               |            |
+|    episode_kills        | 70         |
+|    episode_score        | 7000       |
+|    highest_score        | 45350      |
+| rollout/                |            |
+|    ep_len_mean          | 1.15e+03   |
+|    ep_rew_mean          | 1.33e+03   |
+| time/                   |            |
+|    fps                  | 374        |
+|    iterations           | 62         |
+|    time_elapsed         | 2709       |
+|    total_timesteps      | 1015808    |
+| train/                  |            |
+|    approx_kl            | 0.07226251 |
+|    clip_fraction        | 0.498      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -2.7       |
+|    explained_variance   | 0.0186     |
+|    learning_rate        | 0.0003     |
+|    loss                 | 26.9       |
+|    n_updates            | 610        |
+|    policy_gradient_loss | -0.0658    |
+|    value_loss           | 152        |
+----------------------------------------
+wandb: 
+wandb: Run history:
+wandb:            global_step ▁▁▁▁▂▂▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▅▆▆▆▆▆▇▇▇██
+wandb: robotron/episode_kills ▃▄▄▃█▇▂▂▅▂▁▃▄▃▃▅▃▃█▄▃▇▁▄▆▆▂▄▂▁▄▂▆▂▄▄▄▃▃▃
+wandb: robotron/episode_score ▃▄▃█▄▄▅▃▂▁▃▄▄▃▃▅▃█▄▃▃▇▁▃▄▆▆▃▂▄▄▄▆▂▄▄▄▅▃▃
+wandb: robotron/highest_score ▁▃▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▇▇▇██████
+wandb:    rollout/ep_len_mean ▅█▆▆▅▅▄▄▂▂▁▁▁▁▁▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▁▁▁
+wandb:    rollout/ep_rew_mean ▁▃▅▄▃▄▄▄▄▃▃▂▂▂▂▃▄▄▄▄▄▄▄▄▄▅▅▅▅▆▆▆▆▆▇███▇▆
+wandb:               time/fps █▄▃▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:        train/approx_kl ▁▁▁▁▁▂▂▂▃▃▃▃▃▄▄▄▄▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇█▇▇▇▇███
+wandb:    train/clip_fraction ▁▁▂▂▂▄▄▄▅▄▅▆▅▆▆▆▆▆▇▇▇▇▇▇▇██▇▇█▇████████▇
+wandb:       train/clip_range ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                     +6 ...
+wandb: 
+wandb: Run summary:
+wandb:            global_step 1015808
+wandb: robotron/episode_kills 70
+wandb: robotron/episode_score 7000
+wandb: robotron/highest_score 45350
+wandb:    rollout/ep_len_mean 1150.82
+wandb:    rollout/ep_rew_mean 1330.6
+wandb:               time/fps 374
+wandb:        train/approx_kl 0.07226
+wandb:    train/clip_fraction 0.49821
+wandb:       train/clip_range 0.2
+wandb:                     +6 ...
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /home/strider/Code/robotron-rl/wandb/offline-run-20251013_233120-ot9m8v4i
+wandb: Find logs at: ./wandb/offline-run-20251013_233120-ot9m8v4i/logs
+
+================================================================================
+Training complete!
+================================================================================
+
+📊 Next steps:
+  1. Check: poetry run python check_dense_rewards.py models/ot9m8v4i/checkpoints/ppo_positions_checkpoint_100000_steps.zip
+  2. If successful: Move to Phase 2 (train sprite detector)
+  3. If failed: Try different algorithm (Rainbow DQN, DreamerV3)

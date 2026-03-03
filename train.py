@@ -3,8 +3,8 @@ Train using Stable Baselines3
 """
 import argparse
 
-from robotron2084gym.robotron import RobotronEnv
-from gymnasium.wrappers import GrayScaleObservation, ResizeObservation
+from robotron import RobotronEnv
+from gymnasium.wrappers import GrayscaleObservation, ResizeObservation
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3 import PPO
@@ -62,7 +62,7 @@ def main(model_name: str, config_path: str = None, resume_path: str = None, proj
     run.log_code(name="game_config", include_fn=lambda x: x.endswith(".yaml"))
 
     env = RobotronEnv(**config['env'])
-    env = GrayScaleObservation(env, keep_dim=True)
+    env = GrayscaleObservation(env, keep_dim=True)
     env = ResizeObservation(env, (123, 166))
     env = Monitor(env)
     env = DummyVecEnv([lambda: env])

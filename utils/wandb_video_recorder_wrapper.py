@@ -40,7 +40,13 @@ class WandBVideoRecorderWrapper(VecEnvWrapper):
             if self.use_obs:
                 self.frames.append(obs[0].transpose(2, 0, 1))
             else:
-                self.frames.append(self.env.render('rgb_array').transpose(2, 0, 1))
+                # RobotronEnv.render() returns RGB array directly (no mode argument)
+                frame = self.env.render()
+                if frame is not None:
+                    # Handle both single env and vectorized env
+                    if isinstance(frame, list):
+                        frame = frame[0]  # Take first env
+                    self.frames.append(frame.transpose(2, 0, 1))
 
             self.recorded_frames += 1
 
