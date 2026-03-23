@@ -49,6 +49,12 @@ waves:
 
 extra_life_score: 25000
 
+# Disable visual effects and transitions for maximum training speed
+effects_enabled: false
+warp_in_duration: 0
+death_duration: 0
+level_complete_duration: 0
+
 grunt:
     score: 100
     speed: 7
