@@ -17,6 +17,8 @@ import warnings
 warnings.filterwarnings('ignore', message='.*UnsupportedFieldAttribute.*')
 warnings.filterwarnings('ignore', message='.*Field.*has no.*attribute.*')
 warnings.filterwarnings('ignore', category=DeprecationWarning, module='wandb')
+warnings.filterwarnings('ignore', message='.*frozen.*', category=UserWarning, module='pydantic')
+warnings.filterwarnings('ignore', category=UserWarning, module='pydantic')
 
 from robotron import RobotronEnv
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecNormalize
@@ -28,7 +30,7 @@ import wandb
 import gymnasium as gym
 
 from wrappers import MultiDiscreteToDiscrete, FrameSkipWrapper
-from position_wrapper import GroundTruthPositionWrapper
+from position_wrapper import GroundTruthPositionWrapper, OBS_DIM
 
 
 class SimpleStrongRewardWrapper(gym.Wrapper):
@@ -113,7 +115,7 @@ class VecNormalizeCallback(BaseCallback):
 
 def make_env(config_path: str = None, level: int = 1, lives: int = 5,
              rank: int = 0, seed: int = 0, headless: bool = True,
-             frame_skip: int = 4, max_sprites: int = 20) -> Callable:
+             frame_skip: int = 4) -> Callable:
     def _init():
         env = RobotronEnv(
             level=level,
@@ -131,8 +133,8 @@ def make_env(config_path: str = None, level: int = 1, lives: int = 5,
         # Simple strong reward wrapper
         env = SimpleStrongRewardWrapper(env, score_scale=10.0, verbose=False)
 
-        # KEY: Position wrapper with max_sprites=20 for realistic scenarios
-        env = GroundTruthPositionWrapper(env, max_sprites=max_sprites, verbose=False)
+        # Category-guaranteed position wrapper (41 slots, 986 dims)
+        env = GroundTruthPositionWrapper(env)
 
         env = Monitor(env)
         env.reset(seed=seed + rank)
@@ -140,41 +142,63 @@ def make_env(config_path: str = None, level: int = 1, lives: int = 5,
     return _init
 
 
-def main(config_path: str = 'progressive_curriculum.yaml', device: str = 'cuda:0',
-         num_envs: int = 8, total_timesteps: int = 3_000_000, max_sprites: int = 20):
+def main(config_path: str = 'config.yaml', device: str = 'cuda:0',
+         num_envs: int = 8, total_timesteps: int = 3_000_000,
+         bc_checkpoint: str = None, start_level: int = 1, lives: int = 3,
+         lr: float = None, clip_range: float = None, ent_coef: float = None,
+         vf_coef: float = None):
 
-    # Calculate observation dimension for logging
-    # player_pos (2) + max_sprites * (type_onehot (17) + rel_pos (2) + dist (1) + angle (1) + valid (1))
-    obs_dim = 2 + max_sprites * (17 + 2 + 1 + 1 + 1)
+    fine_tuning = bc_checkpoint is not None
 
     config = {
         'model': 'ppo',
         'total_timesteps': total_timesteps,
         'num_envs': num_envs,
-        'observation_type': 'positions_progressive',
+        'observation_type': 'positions_category_slots',
         'score_scale': 10.0,
-        'max_sprites': max_sprites,
-        'obs_dim': obs_dim,
+        'obs_dim': OBS_DIM,
         'config_path': config_path,
+        'bc_checkpoint': bc_checkpoint,
+        'start_level': start_level,
+        'fine_tuning': fine_tuning,
     }
 
-    # PPO with larger MLP for complex scenarios
-    model_kwargs = {
-        'policy': 'MlpPolicy',
-        'n_steps': 2048,
-        'batch_size': 64,
-        'n_epochs': 10,
-        'gamma': 0.99,
-        'gae_lambda': 0.95,
-        'clip_range': 0.2,
-        'ent_coef': 0.01,
-        'vf_coef': 0.5,
-        'max_grad_norm': 0.5,
-        'learning_rate': 3e-4,
-        'policy_kwargs': {
-            'net_arch': [512, 512],  # Larger network for complex scenarios (was 256x256)
-        },
-    }
+    if fine_tuning:
+        # Tighter HPs to preserve BC initialization (overridable via CLI)
+        model_kwargs = {
+            'policy': 'MlpPolicy',
+            'n_steps': 2048,
+            'batch_size': 128,
+            'n_epochs': 10,
+            'gamma': 0.995,
+            'gae_lambda': 0.95,
+            'clip_range': clip_range if clip_range is not None else 0.1,
+            'ent_coef': ent_coef if ent_coef is not None else 0.005,
+            'vf_coef': vf_coef if vf_coef is not None else 0.5,
+            'max_grad_norm': 0.5,
+            'learning_rate': lr if lr is not None else 5e-5,
+            'policy_kwargs': {
+                'net_arch': [512, 512],
+            },
+        }
+    else:
+        # Scratch training HPs (overridable via CLI)
+        model_kwargs = {
+            'policy': 'MlpPolicy',
+            'n_steps': 2048,
+            'batch_size': 64,
+            'n_epochs': 10,
+            'gamma': 0.99,
+            'gae_lambda': 0.95,
+            'clip_range': clip_range if clip_range is not None else 0.2,
+            'ent_coef': ent_coef if ent_coef is not None else 0.01,
+            'vf_coef': vf_coef if vf_coef is not None else 0.5,
+            'max_grad_norm': 0.5,
+            'learning_rate': lr if lr is not None else 3e-4,
+            'policy_kwargs': {
+                'net_arch': [512, 512],
+            },
+        }
 
     run = wandb.init(
         project="robotron",
@@ -185,33 +209,23 @@ def main(config_path: str = 'progressive_curriculum.yaml', device: str = 'cuda:0
         mode="offline",
     )
 
+    mode_str = f"BC fine-tuning from {bc_checkpoint}" if fine_tuning else "scratch"
     print("="*80)
     print("PROGRESSIVE CURRICULUM TRAINING (POSITION-BASED RL)")
     print("="*80)
-    print(f"  Observation: Sprite positions ({obs_dim} dims)")
-    print(f"  Policy: MlpPolicy (2x512 layers - larger for complex scenarios)")
-    print(f"  Reward: score_delta / 10.0")
-    print(f"  Config: {config_path}")
-    print(f"  Max sprites: {max_sprites}")
-    print(f"  Total timesteps: {total_timesteps:,}")
+    print(f"  Mode:        {mode_str}")
+    print(f"  Observation: Category-slot positions ({OBS_DIM} dims, 41 slots)")
+    print(f"  Policy:      MlpPolicy (2x512)")
+    print(f"  Reward:      score_delta / 10.0")
+    print(f"  Config:      {config_path}")
+    print(f"  Start level: {start_level}")
+    print(f"  Timesteps:   {total_timesteps:,}")
+    if fine_tuning:
+        print(f"  clip_range={model_kwargs['clip_range']}  ent_coef={model_kwargs['ent_coef']}  lr={model_kwargs['learning_rate']}  (fine-tuning HPs)")
     print("="*80)
-    print("\n🎯 TESTING: Can position-based RL scale to full game complexity?")
-    print("\n📚 Curriculum Stages:")
-    print("   Stage 1 (Levels 1-3):   1-3 grunts")
-    print("   Stage 2 (Levels 4-6):   3-5 grunts + obstacles + family")
-    print("   Stage 3 (Levels 7-9):   5-8 grunts + hulks (unkillable)")
-    print("   Stage 4 (Levels 10-12): 10-15 grunts (realistic counts)")
-    print("   Stage 5 (Levels 13-15): Add spawners (brains, sphereoids)")
-    print("   Stage 6 (Levels 16-18): Add quarks (tank spawners)")
-    print("   Stage 7 (Levels 19-21): Full difficulty (25-35 grunts + all enemies)")
-    print("\n🎖️  Success Criteria:")
-    print("   - Master Stage 1-3: 100% of episodes (already proven)")
-    print("   - Master Stage 4: 10+ kills consistently")
-    print("   - Master Stage 5-7: 30+ kills on realistic levels")
-    print("   - Maintain action diversity throughout\n")
 
     envs = SubprocVecEnv([
-        make_env(config_path, level=1, lives=5, rank=i, seed=42, headless=True, max_sprites=max_sprites)
+        make_env(config_path, level=start_level, lives=lives, rank=i, seed=42, headless=True)
         for i in range(num_envs)
     ])
 
@@ -225,6 +239,12 @@ def main(config_path: str = 'progressive_curriculum.yaml', device: str = 'cuda:0
         device=device,
         **model_kwargs
     )
+
+    if fine_tuning and bc_checkpoint:
+        print(f"\nLoading BC weights from {bc_checkpoint}...")
+        bc_model = PPO.load(bc_checkpoint, env=envs, device=device)
+        model.set_parameters(bc_model.get_parameters())
+        print("BC weights loaded successfully.")
 
     callbacks = [
         MetricsCallback(verbose=1),
@@ -247,12 +267,12 @@ def main(config_path: str = 'progressive_curriculum.yaml', device: str = 'cuda:0
         ),
     ]
 
-    print("\nStarting training...")
-    print(f"Expected timeline:")
-    print(f"  100k-500k steps: Master Stage 1-3 (1-9 sprites)")
-    print(f"  500k-1M steps: Master Stage 4 (10-15 grunts)")
-    print(f"  1M-2M steps: Master Stage 5-6 (spawners)")
-    print(f"  2M-3M steps: Master Stage 7 (full difficulty)\n")
+    if fine_tuning:
+        print("\nStarting fine-tuning from BC checkpoint...")
+        print("  Expected: W7+ at 500k steps, W10+ at 2M steps\n")
+    else:
+        print("\nStarting training from scratch...")
+        print("  Expected: Playable at 1M+ steps\n")
 
     model.learn(total_timesteps=config['total_timesteps'], callback=callbacks)
 
@@ -261,31 +281,32 @@ def main(config_path: str = 'progressive_curriculum.yaml', device: str = 'cuda:0
 
     print("\n" + "="*80)
     print("Training complete!")
+    print(f"  Model saved to: models/{run.id}/")
     print("="*80)
-    print("\n📊 Next steps:")
-    print(f"  1. Evaluate: poetry run python check_position_model.py models/{run.id}/checkpoints/ppo_progressive_checkpoint_3000000_steps.zip")
-    print(f"  2. If successful on complex levels → Position-based RL scales!")
-    print(f"  3. If failed → May need:")
-    print(f"     - Larger network (1024x1024)")
-    print(f"     - More training (5M+ steps)")
-    print(f"     - Different feature engineering")
-    print(f"  4. If successful → Proceed to Phase 2 (sprite detector)")
 
     run.finish()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Progressive curriculum position-based RL")
-    parser.add_argument("--config", type=str, default='progressive_curriculum.yaml',
-                       help="Path to game config")
-    parser.add_argument("--device", type=str, default='cuda:0',
-                       help="Device to train on")
-    parser.add_argument("--num-envs", type=int, default=8,
-                       help="Number of parallel environments")
-    parser.add_argument("--timesteps", type=int, default=3_000_000,
-                       help="Total timesteps to train")
-    parser.add_argument("--max-sprites", type=int, default=20,
-                       help="Max sprites to track (default: 20)")
+    parser.add_argument("--config",         type=str, default='config.yaml')
+    parser.add_argument("--device",         type=str, default='cuda:0')
+    parser.add_argument("--num-envs",       type=int, default=8)
+    parser.add_argument("--timesteps",      type=int, default=3_000_000)
+    parser.add_argument("--bc-checkpoint",  type=str, default=None,
+                        help="Path to BC model zip (from train_bc.py). Triggers fine-tuning HPs.")
+    parser.add_argument("--start-level",    type=int, default=1,
+                        help="Curriculum starting level (use 5 with --bc-checkpoint)")
+    parser.add_argument("--lives",          type=int, default=3,
+                        help="Starting lives per episode (default: 3, original game value)")
+    parser.add_argument("--lr",             type=float, default=None,
+                        help="Learning rate override (default: 5e-5 fine-tune, 3e-4 scratch)")
+    parser.add_argument("--clip-range",     type=float, default=None,
+                        help="PPO clip range override (default: 0.1 fine-tune, 0.2 scratch)")
+    parser.add_argument("--ent-coef",       type=float, default=None,
+                        help="Entropy coefficient override (default: 0.005 fine-tune, 0.01 scratch)")
+    parser.add_argument("--vf-coef",        type=float, default=None,
+                        help="Value function coefficient override (default: 0.5)")
 
     args = parser.parse_args()
     main(
@@ -293,5 +314,11 @@ if __name__ == "__main__":
         device=args.device,
         num_envs=args.num_envs,
         total_timesteps=args.timesteps,
-        max_sprites=args.max_sprites
+        bc_checkpoint=args.bc_checkpoint,
+        start_level=args.start_level,
+        lives=args.lives,
+        lr=args.lr,
+        clip_range=args.clip_range,
+        ent_coef=args.ent_coef,
+        vf_coef=args.vf_coef,
     )
