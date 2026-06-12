@@ -50,10 +50,10 @@ GYM_TYPE_TO_LABEL = {
     'Daddy':         'CM',
     'Mikey':         'CC',
     'Prog':          'P',
-    'Cruise':        'MS',
+    'CruiseMissile': 'MS',
     'EnforcerBullet':'FB',
     'TankShell':     'TS',
-    'PlayerBullet':  None,  # skip our own bullets
+    'Bullet':        None,  # player bullets excluded
 }
 
 CIVILIAN_LABELS = frozenset({'CC', 'CW', 'CM'})

@@ -17,3 +17,12 @@ run/
 runs/
 models/
 videos/
+# MAME gym: copyrighted ROM content + machine save states (ROM-derived) stay out
+mame_gym/roms/
+mame_states/
+
+# Training artifacts / local logs
+logs/
+demos/
+runs_old/
+*.log

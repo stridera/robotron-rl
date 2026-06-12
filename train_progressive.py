@@ -33,31 +33,127 @@ from wrappers import MultiDiscreteToDiscrete, FrameSkipWrapper
 from position_wrapper import GroundTruthPositionWrapper, OBS_DIM
 
 
+SPAWNER_TYPES = frozenset({'Sphereoid', 'Quark'})
+SHOOTER_TYPES = frozenset({'Enforcer', 'Tank'})
+
+
 class SimpleStrongRewardWrapper(gym.Wrapper):
-    """Simple strong reward: score/10 (10x stronger than original)."""
+    """Reward wrapper with targeted shaping for Robotron RL.
+
+    Components:
+      - score_delta / score_scale  (base reward from game score)
+      - Spawner kill bonus: 5x multiplier when Sphereoid/Quark count drops
+      - Death penalty: flat negative reward on losing a life
+      - Survival bonus: small positive reward each step alive (teaches danger avoidance)
+      - Stagnation penalty: penalize staying in one spot too long
+    """
+    STAGNATION_WINDOW = 30   # frames to look back
+    STAGNATION_DIST = 20.0   # pixels — must move at least this much over the window
+    STAGNATION_PENALTY = -0.5  # per step when stagnant
+    SPAWNER_KILL_BONUS = 50.0  # bonus per spawner killed (on top of score reward)
+    SHOOTER_KILL_BONUS = 20.0  # bonus per Enforcer/Tank killed (reduces bullet density)
+    DEATH_PENALTY = -20.0      # penalty per death (increased from -5 to make dying truly costly)
+    SURVIVAL_BONUS = 0.3       # per step alive — teaches value net to avoid danger (increased from 0.1)
+    WAVE_COMPLETE_BONUS = 250.0  # bonus per wave cleared — teaches wave progression as intrinsic goal (increased from 100)
 
     def __init__(self, env, score_scale=10.0, verbose=False):
         super().__init__(env)
         self.score_scale = score_scale
         self.verbose = verbose
         self.last_score = 0
+        self.last_level = 0
+        self.last_lives = 0
+        self.last_spawner_count = 0
+        self.last_shooter_count = 0
+        self._pos_history = []
+
+    def _player_pos(self):
+        player = self.env.unwrapped.engine.player
+        return (float(player.rect.x), float(player.rect.y))
+
+    def _count_spawners(self):
+        return sum(1 for s in self.env.unwrapped.engine.enemy_group
+                   if s.__class__.__name__ in SPAWNER_TYPES)
+
+    def _count_shooters(self):
+        return sum(1 for s in self.env.unwrapped.engine.enemy_group
+                   if s.__class__.__name__ in SHOOTER_TYPES)
 
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
-        self.last_score = self.env.unwrapped.engine.score
+        engine = self.env.unwrapped.engine
+        self.last_score = engine.score
+        self.last_lives = engine.lives
+        self.last_spawner_count = self._count_spawners()
+        self.last_shooter_count = self._count_shooters()
+        self.last_level = engine.level
+        self._pos_history = [self._player_pos()]
         return obs, info
 
     def step(self, action):
         obs, reward, terminated, truncated, info = self.env.step(action)
+        engine = self.env.unwrapped.engine
 
-        current_score = self.env.unwrapped.engine.score
+        current_score = engine.score
         score_delta = current_score - self.last_score
         self.last_score = current_score
 
         reward = score_delta / self.score_scale
 
+        # Spawner kill bonus: detect Sphereoid/Quark count drop
+        spawner_count = self._count_spawners()
+        spawners_killed = self.last_spawner_count - spawner_count
+        if spawners_killed > 0 and score_delta > 0:
+            reward += self.SPAWNER_KILL_BONUS * spawners_killed
+        self.last_spawner_count = spawner_count
+
+        # Shooter kill bonus: detect Enforcer/Tank count drop (reduces bullet density)
+        shooter_count = self._count_shooters()
+        shooters_killed = self.last_shooter_count - shooter_count
+        if shooters_killed > 0 and score_delta > 0:
+            reward += self.SHOOTER_KILL_BONUS * shooters_killed
+        self.last_shooter_count = shooter_count
+
+        # Death penalty: detect life loss
+        current_lives = engine.lives
+        current_level = engine.level
+        if current_lives < self.last_lives:
+            reward += self.DEATH_PENALTY
+        else:
+            # Survival bonus scaled by current level — deeper waves worth more alive
+            reward += self.SURVIVAL_BONUS * max(1, current_level)
+        self.last_lives = current_lives
+
+        # Wave completion bonus scaled by destination level — linear scaling proved more effective than quadratic
+        if current_level > self.last_level:
+            reward += self.WAVE_COMPLETE_BONUS * current_level * (current_level - self.last_level)
+            # Step-function deep-wave bonuses on top of linear: sharper gradient toward W5+ to break ~200k peak ceiling
+            for crossed in range(self.last_level + 1, current_level + 1):
+                if crossed >= 10:
+                    reward += 8000.0
+                elif crossed >= 7:
+                    reward += 3000.0
+                elif crossed >= 5:
+                    reward += 1000.0
+        self.last_level = current_level
+
+        # Stagnation penalty: discourage camping in one spot
+        pos = self._player_pos()
+        self._pos_history.append(pos)
+        if len(self._pos_history) > self.STAGNATION_WINDOW:
+            old_pos = self._pos_history[-self.STAGNATION_WINDOW]
+            dx = pos[0] - old_pos[0]
+            dy = pos[1] - old_pos[1]
+            dist = (dx * dx + dy * dy) ** 0.5
+            if dist < self.STAGNATION_DIST:
+                reward += self.STAGNATION_PENALTY
+        # Cap history length
+        if len(self._pos_history) > self.STAGNATION_WINDOW + 10:
+            self._pos_history = self._pos_history[-self.STAGNATION_WINDOW:]
+
         if self.verbose and score_delta > 0:
-            print(f"  Kill! Score delta: {score_delta} → Reward: {reward:.1f}")
+            print(f"  Kill! Score delta: {score_delta} → Reward: {reward:.1f}"
+                  f"{' SPAWNER!' if spawners_killed > 0 else ''}")
 
         return obs, reward, terminated, truncated, info
 

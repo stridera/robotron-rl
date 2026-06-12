@@ -1,8 +1,8 @@
 """
-Collect expert demonstrations from Brain3GymAdapter for behavioral cloning.
+Collect expert demonstrations from Brain4GymAdapter for behavioral cloning.
 
 Runs N gym environments in a round-robin loop (single process, each with its own
-Brain3GymAdapter instance) and records (obs, action) pairs.
+Brain4GymAdapter instance) and records (obs, action) pairs.
 
 Speed note: headless pygame renders off-screen at ~60 FPS even with fps=0.
 Use --jobs to spawn multiple OS-level processes and merge results.
@@ -31,7 +31,7 @@ from collections import defaultdict
 from robotron import RobotronEnv
 from wrappers import MultiDiscreteToDiscrete, FrameSkipWrapper
 from position_wrapper import GroundTruthPositionWrapper, OBS_DIM
-from brain3_gym_adapter import Brain3GymAdapter
+from brain4_gym_adapter import Brain4GymAdapter
 
 
 def make_env(config_path: str, level: int, seed: int, headless: bool = True):
@@ -65,7 +65,7 @@ def _worker(worker_id: int, target: int, config: str, envs_per_worker: int,
         envs.append(env)
         obs_s.append(obs)
         info_s.append(info)
-        adapters.append(Brain3GymAdapter())
+        adapters.append(Brain4GymAdapter())
 
     obs_buf    = np.zeros((target, OBS_DIM), dtype=np.float32)
     action_buf = np.zeros((target, 2),       dtype=np.int32)
@@ -152,7 +152,7 @@ def main():
         for i in range(args.envs):
             env, obs, info = make_env(args.config, levels[i], seed=i * 1000)
             envs.append(env); obs_s.append(obs); info_s.append(info)
-            adapters.append(Brain3GymAdapter())
+            adapters.append(Brain4GymAdapter())
 
         obs_buf     = np.zeros((args.target, OBS_DIM), dtype=np.float32)
         action_buf  = np.zeros((args.target, 2),        dtype=np.int32)

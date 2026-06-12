@@ -5,10 +5,10 @@ Instead of raw pixels, outputs sprite positions relative to player using
 category-guaranteed slots so strategically important entities (spawners,
 civilians, shooters) are always visible regardless of distance.
 
-Observation format (986 dims):
+Observation format (945 dims):
   [0:2]   player position, normalized to [-1, 1]
-  [2:986] 41 entity slots × 24 features each:
-            type one-hot  (17)
+  [2:945] 41 entity slots × 23 features each:
+            type one-hot  (16)
             rel_pos       (2)   normalized to [-1, 1]
             dist          (1)   normalized to [0, 1]
             angle         (1)   in [-pi, pi]
