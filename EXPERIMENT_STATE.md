@@ -219,6 +219,63 @@ Fix: index now 2 bytes (b2 high, b3 low) in both `mame_bridge.py` and
 `robotron_server.lua` (b3 was free — only STEP uses it, as fire-dir).
 Roundtrip-tested at index 500. Existing w5_0..253 still load correctly.
 
+## 2026-06-12 — Continuous-play results
+
+| link | warm-start | continuous eval (15 runs from wave-1 boot) | note |
+|---|---|---|---|
+| (baseline 88ir32b3) | — | wave mean 3.1, score mean 10,205 | pre-pivot wave-specialist |
+| C1 rz5g3pf5 | 88ir32b3 | wave mean **3.2**, score mean **14,877 (+46%)**, max 39,925 | civilian reward works: collects far more per wave, episodes 3× longer; 1-up flywheel starting (runs that banked a bonus life at ~25k reached wave 5-6) |
+| C2 w9hbrcvb | rz5g3pf5 | wave mean **3.1**, score mean 11,342, max 18,175 | mid-game bridge did NOT help (slight regression). Bottleneck isn't mid-game competence — it's early-game survival |
+| C3 h5zb13yl | rz5g3pf5 | wave mean **2.6**, score 9,345 | death penalty -200/-75 made it WORSE (more early deaths). Big terminal spike destabilized, didn't teach caution. REVERTED to -20 |
+| C4 i2xxuxxe | rz5g3pf5 | wave mean **3.0**, score 11,588 | pure wave-1 + ent 0.02. Training metrics climbed (ep_rew 3447, ep_len 672 highs) but eval depth flat. 4 links / 12M steps stuck at wave ~3 |
+| C5 u0a6z8v4 | i2xxuxxe | wave mean **3.2**, score 11,142 (dist nudged to w4: 9/20) | 1-up bonus didn't break the wall either |
+
+PLATEAU CONFIRMED: 5 continuous links / 15M steps, all mean wave 2.6-3.2.
+Reward shaping is exhausted (civilian, bridge, death-penalty, pure-wave-1,
+entropy, 1-up bonus). NOT a reward problem.
+
+C5 death forensics (19,938 training deaths, all continuous wave-1):
+- deaths peak at WAVE 2-3 (7,347 + 7,753), taper at 4 (3,334), ~0 past 6
+- 66% explained-direct, 21% closing — legit deaths to known enemies
+- **dominant killer: GRUNT (7,328 of ~13k in-range = 55%)**, then Hulk 1,909,
+  EnfBullet/Spark 1,771, Electrode 884, Enforcer 731, Spheroid 717
+- ("Mom"/"Mikey" 516 = forensic artifact: died NEAR a civilian it was chasing)
+
+INTERPRETATION: the policy that survives wave 29 from a save state dies to
+basic GRUNTS in the sparse early game. Frontier training rewarded aggressive
+wave-clearing on DENSE boards; it never learned careful evasion/survival in the
+open early game, and warm-started reward-tweaks can't transform that core
+behavior. Crucially, continuous-from-wave-1 is likely the SAME low-wave
+plateau that motivated the save-state ladder originally — so this is probably
+not fixable by reward shaping or more of the same. Real options: (a) from-
+scratch continuous (no anchored dense-board habits), (b) architecture —
+recurrent policy / richer obs for spatial evasion, (c) much more compute, (d)
+accept specialists + rethink deployment. HELD for user direction at this fork.
+
+PLATEAU: C1-C4 all wave ~3 despite civilian reward, mid-game bridge, death
+penalty, pure-wave-1, entropy. Common thread: policy dies at ~21k, just short
+of the 25k first bonus life — so the lives→depth flywheel never ignites. C5
+rewards banking a 1-up directly. If still flat, escalate: from-scratch
+continuous (warm-start may be a local-optimum trap) or revisit obs/architecture.
+
+After C1-C3 (9M steps) stuck at wave ~3, the deep 1-life retention states are
+suspected of sabotaging continuous learning (each teaches single-life myopia).
+C4 drops them (pure wave-1 full-lives) + bumps entropy. If still stuck, the
+warm-start itself is a local-optimum trap → next is FROM-SCRATCH continuous
+training (no frontier baggage), accepting a slower climb.
+
+Diagnosis after C1/C2 (6M steps, depth stuck at ~3): NOT a training-time
+problem — a reward-structure one. Death was -20 vs wave-clear ~250*wave (~750)
+and rescue ~175, so death was trivially cheap → policy rushes, dies at wave 3-4
+BEFORE banking the ~25k bonus life that starts the 1-up snowball. C3 makes
+survival pay. If depth still flat, the wall is the warm-start local optimum
+(→ try from-scratch or higher entropy) or the policy/obs ceiling.
+
+Read: depth gated by the 1-up flywheel (rescue→25k bonus life→go deeper). C1
+turned the flywheel on (score doubled) but depth needs the early-game survival
+to become reliable. C2 keeps wave-1-heavy training (the 1→5 chain) + bridges
+the wall. Success metric = `eval_continuous` mean wave, NOT frontier ATH.
+
 ## 2026-06-11 — REBOOT WIPED /tmp: save-state pool lost, link 16 cut short
 
 Host went down ~03:30 (rebooted 09:14). `/tmp/mame_states` held the ENTIRE

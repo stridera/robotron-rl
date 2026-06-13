@@ -43,7 +43,8 @@ def typed_sprites(builder, packet):
     (label, x, y) in game units (player excluded)."""
     sprites = builder._sprites_from_packet(packet)
     out = []
-    for spx, spy, name in sprites[1:]:
+    for sp in sprites[1:]:
+        spx, spy, name = sp[0], sp[1], sp[2]
         gx = spx / 665.0 * 140 + 5
         gy = spy / 492.0 * 215 + 15
         out.append((name, gx, gy))

@@ -257,17 +257,28 @@ class MameRobotronEnv(gym.Env):
             self._pkt_history.pop(0)
         self._last_packet = packet
 
-        # Reward shaping — identical family to train_native.py.
-        # On the terminal step the game has already flipped to attract mode,
-        # where $BDED reads garbage (e.g. 41) and score may reset. Computing
-        # wave/score deltas there banks a massive spurious bonus ON DEATH —
-        # rewarding suicide. Terminal step gets the death penalty only.
+        # Reward shaping. On the terminal step the game has flipped to attract
+        # mode ($BDED garbage), so terminal gets the death penalty ONLY (no
+        # wave/score deltas → no spurious suicide bonus).
+        # Death penalty -20: C3 tested a heavy penalty (-200/-75) and it made
+        # continuous play WORSE (mean wave 3.2→2.6, more early deaths) — a big
+        # negative terminal spike destabilized rather than taught caution.
+        # Reverted to the C1 value (best continuous result).
         if terminated:
             reward = -20.0
         else:
             reward = score_delta / 10.0
             if lives < self._last_lives:
                 reward += -20.0
+            elif lives > self._last_lives:
+                # Banked a bonus life (Robotron awards one at ~25k). This is the
+                # SNOWBALL TRIGGER for a marathon: more lives -> survive deeper
+                # -> rescue more -> more lives. C1-C4 stalled at wave ~3 because
+                # the policy dies (~21k) just short of the first bonus life and
+                # never starts the flywheel. Reward the 1-up directly so the
+                # value function pulls play toward crossing that threshold
+                # (2026-06-13).
+                reward += 250.0
             else:
                 reward += 0.3 * max(1, int(wave))
             # Real play advances exactly one wave at a time; a jump >1 means

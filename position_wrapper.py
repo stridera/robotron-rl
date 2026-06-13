@@ -118,22 +118,27 @@ class GroundTruthPositionWrapper(gym.ObservationWrapper):
         # Separate player from entities
         player_pos = None
         entities = []
-        for x, y, sprite_type in sprite_data:
+        for item in sprite_data:
+            x, y, sprite_type = item[0], item[1], item[2]
+            # Optional identity-stable velocity (vx, vy) supplied by the caller
+            # (MameObsBuilder keys it by entity node address). If absent (python
+            # gym path), velocity falls back to the slot-key delta below.
+            vxy = (float(item[3]), float(item[4])) if len(item) >= 5 else None
             if sprite_type == 'Player':
                 player_pos = np.array([float(x), float(y)], dtype=np.float32)
             elif sprite_type != 'Bullet':  # player bullets excluded — inferred from firing actions
-                entities.append((float(x), float(y), sprite_type))
+                entities.append((float(x), float(y), sprite_type, vxy))
 
         if player_pos is None:
             player_pos = np.array([self.width / 2.0, self.height / 2.0], dtype=np.float32)
 
         # Compute distance from player for all entities
         entity_list = []
-        for x, y, t in entities:
+        for x, y, t, vxy in entities:
             pos = np.array([x, y], dtype=np.float32)
             rel = pos - player_pos
             dist = float(np.linalg.norm(rel))
-            entity_list.append({'pos': pos, 'rel': rel, 'dist': dist, 'type': t})
+            entity_list.append({'pos': pos, 'rel': rel, 'dist': dist, 'type': t, 'vxy': vxy})
 
         # Sort by distance (used for within-category and catch-all ordering)
         entity_list.sort(key=lambda e: e['dist'])
@@ -184,14 +189,24 @@ class GroundTruthPositionWrapper(gym.ObservationWrapper):
                 dist_norm = float(dist / self.max_distance)
                 angle = float(np.arctan2(rel[1], rel[0]))
 
-                # Velocity: delta from previous frame position
-                prev = self._prev_positions.get(slot_key)
-                if prev is not None:
-                    vx = np.clip((pos[0] - prev[0]) / self.max_distance, -1.0, 1.0)
-                    vy = np.clip((pos[1] - prev[1]) / self.max_distance, -1.0, 1.0)
+                # Velocity. Prefer the identity-stable velocity threaded in by
+                # the caller (keyed by entity node address). The slot-key delta
+                # below is WRONG for evasion: slots are distance-RANKED, so a
+                # given slot holds a different entity when ranks swap, making the
+                # delta a garbage between-entities difference — the policy could
+                # never perceive true enemy motion (root cause of the wave-3
+                # continuous wall; fixed 2026-06-13).
+                if entity['vxy'] is not None:
+                    vx = float(np.clip(entity['vxy'][0] / self.max_distance, -1.0, 1.0))
+                    vy = float(np.clip(entity['vxy'][1] / self.max_distance, -1.0, 1.0))
                 else:
-                    vx, vy = 0.0, 0.0
-                self._prev_positions[slot_key] = (float(pos[0]), float(pos[1]))
+                    prev = self._prev_positions.get(slot_key)
+                    if prev is not None:
+                        vx = np.clip((pos[0] - prev[0]) / self.max_distance, -1.0, 1.0)
+                        vy = np.clip((pos[1] - prev[1]) / self.max_distance, -1.0, 1.0)
+                    else:
+                        vx, vy = 0.0, 0.0
+                    self._prev_positions[slot_key] = (float(pos[0]), float(pos[1]))
 
                 # Type one-hot
                 type_oh = np.zeros(NUM_TYPES, dtype=np.float32)

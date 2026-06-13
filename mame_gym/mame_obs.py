@@ -141,10 +141,15 @@ class MameObsBuilder:
         # node-address -> (sw, x, y) from the previous packet; node address is
         # a stable identity for the entity's lifetime (velocity tracking).
         self._node_prev: dict[int, tuple[int, int, int]] = {}
+        # node-address -> (pixel_x, pixel_y) previous frame, for identity-stable
+        # velocity (the extractor's slot-rank velocity is garbage; see
+        # position_wrapper). Keyed by the same stable node address.
+        self._entity_prev_pos: dict[int, tuple[float, float]] = {}
 
     def reset(self):
         self._extractor._prev_positions.clear()
         self._node_prev.clear()
+        self._entity_prev_pos.clear()
 
     def __call__(self, packet: bytes) -> np.ndarray:
         return self._extractor._extract_features(self._sprites_from_packet(packet))
@@ -176,6 +181,7 @@ class MameObsBuilder:
         px, py = _gxgy_to_pixel(packet[5], packet[7])
         sprites.append((px, py, "Player"))
         new_prev: dict[int, tuple[int, int, int]] = {}
+        new_pos: dict[int, tuple[float, float]] = {}
         for addr, list_id, sw, x, y in iter_entities(packet):
             if list_id == LIST_ELECTRODE:
                 rl_name = "Electrode"
@@ -196,8 +202,14 @@ class MameObsBuilder:
             if rl_name is None:
                 continue
             spx, spy = _gxgy_to_pixel(x, y)
-            sprites.append((spx, spy, rl_name))
+            # Identity-stable velocity in pixel space, by node address.
+            prev = self._entity_prev_pos.get(addr)
+            vx = spx - prev[0] if prev is not None else 0.0
+            vy = spy - prev[1] if prev is not None else 0.0
+            new_pos[addr] = (spx, spy)
+            sprites.append((spx, spy, rl_name, vx, vy))
         self._node_prev = new_prev
+        self._entity_prev_pos = new_pos
         return sprites
 
 
