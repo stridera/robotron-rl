@@ -25,10 +25,11 @@ VECNORM = sys.argv[2]
 N = int(sys.argv[3]) if len(sys.argv) > 3 else 15
 PORT = int(sys.argv[4]) if len(sys.argv) > 4 else 9970
 DETERMINISTIC = len(sys.argv) > 5 and sys.argv[5] == "det"
+OBS_MODE = sys.argv[6] if len(sys.argv) > 6 else "slot"
 
 
 def main():
-    env = MameRobotronEnv(rank=0, base_port=PORT, frameskip=4, reset_pool=[0])
+    env = MameRobotronEnv(rank=0, base_port=PORT, frameskip=4, reset_pool=[0], obs_mode=OBS_MODE)
     venv = DummyVecEnv([lambda: env])
     venv = VecNormalize.load(VECNORM, venv)
     venv.training = False

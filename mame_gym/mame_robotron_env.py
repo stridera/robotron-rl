@@ -104,7 +104,8 @@ class MameRobotronEnv(gym.Env):
 
     def __init__(self, rank: int = 0, base_port: int = 9200, frameskip: int = 4,
                  reset_pool: list[int] | None = None,
-                 auto_capture_min_wave: int | None = None):
+                 auto_capture_min_wave: int | None = None,
+                 obs_mode: str = "slot"):
         """reset_pool: list of save-state indices to sample episode starts
         from. 0 = wave-1 boot state; N>0 = 'w5_N' deep-wave state. Default
         [0] = always start at wave 1.
@@ -113,10 +114,20 @@ class MameRobotronEnv(gym.Env):
         episode enters a wave >= this (settled past the transition). Training
         envs reach frontier waves orders of magnitude more often than the
         single-env capture script (which got 0 wave-13 entries in 400
-        episodes), so this turns those moments into next-link reset seeds."""
+        episodes), so this turns those moments into next-link reset seeds.
+
+        obs_mode: 'slot' = 945-dim distance-ranked category-slot obs (MLP);
+        'grid' = (11,36,24) spatial grid for a CNN policy (preserves global
+        field geometry — the slot+MLP setup walled continuous play at wave ~3)."""
         super().__init__()
         self.action_space = MultiDiscrete([8, 8])
-        self.observation_space = Box(low=-np.inf, high=np.inf, shape=(945,), dtype=np.float32)
+        self._obs_mode = obs_mode
+        if obs_mode == "grid":
+            from spatial_obs import SpatialGridObsBuilder, NUM_CHANNELS, GRID_H, GRID_W
+            self.observation_space = Box(low=-np.inf, high=np.inf,
+                                         shape=(NUM_CHANNELS, GRID_H, GRID_W), dtype=np.float32)
+        else:
+            self.observation_space = Box(low=-np.inf, high=np.inf, shape=(945,), dtype=np.float32)
         self._port = base_port + rank
         self._frameskip = frameskip
         self._reset_pool = list(reset_pool) if reset_pool else [0]
@@ -125,7 +136,11 @@ class MameRobotronEnv(gym.Env):
         self._auto_min_wave = auto_capture_min_wave
         self._auto_settle = -1          # countdown to save; -1 = disarmed
         self._auto_saved_waves: set[int] = set()   # per-episode
-        self._obs_builder = MameObsBuilder()
+        if obs_mode == "grid":
+            from spatial_obs import SpatialGridObsBuilder
+            self._obs_builder = SpatialGridObsBuilder()
+        else:
+            self._obs_builder = MameObsBuilder()
         self._bridge: MameBridge | None = None
         self._last_score = 0
         self._last_lives = 0
