@@ -252,6 +252,62 @@ scratch continuous (no anchored dense-board habits), (b) architecture —
 recurrent policy / richer obs for spatial evasion, (c) much more compute, (d)
 accept specialists + rethink deployment. HELD for user direction at this fork.
 
+## 2026-06-13 — ROOT CAUSE FOUND & FIXED: garbage entity velocity in obs
+
+From-scratch continuous (no warm-start) evaled at mean wave 2.8 — SAME wall as
+warm-started (2.6-3.2). So not anchoring → representational. Checked the obs:
+velocity was computed per distance-RANKED slot (`slot_key=(category, rank)`) in
+position_wrapper._extract_features. Enemies reorder by distance every frame, so
+each slot's velocity = delta between two DIFFERENT entities = garbage. The
+policy literally could not perceive enemy motion — and the death forensics
+(dies to predictable GRUNTS in waves 2-3, 55% of kills) is exactly the symptom.
+Harmless for the dense save-state frontier (reactive shooting), fatal for
+open-early-game evasion.
+
+Fix (commit cc93a12): MameObsBuilder computes velocity by stable node address,
+threads (vx,vy) per sprite into _extract_features (prefers it over slot-key
+delta; python-gym path unchanged). Verified realistic motion (~13px/step
+grunts, ~0 family). C6 = warm-start rz5g3pf5 + fixed obs, pure wave-1. This is
+the highest-confidence lead yet — if the wall is the velocity bug, depth should
+finally climb. Eval pending.
+
+C6 (warm-start + fixed obs) evaled mean wave 3.2 — flat. Expected: the warm-
+started policy already learned to IGNORE the velocity channel (noise), so it
+doesn't suddenly use it. Clean test = from-scratch WITH fixed velocity
+(scratch2, runs/oiwnq38o): a fresh policy can learn to exploit real motion from
+the start. Compare to garbage-velocity from-scratch (mean 2.8): scratch2 > that
+⇒ velocity helps; scratch2 also ~3 ⇒ wall is deeper (architecture/difficulty).
+
+## 2026-06-13 — CONCLUSIVE: wave-3 wall is robust to ALL interventions
+
+scratch2 (fresh + fixed velocity) evaled mean wave 2.8 = SAME as garbage-
+velocity from-scratch (2.8). Velocity fix is correct but was NOT the bottleneck.
+
+Full continuous-play ablation (eval = mean wave from a true wave-1 boot, 2 lives):
+| config | mean wave |
+|---|---|
+| baseline frontier head (88ir32b3) | 3.1 |
+| C1 civilian reward | 3.2 |
+| C2 + mid-game bridge | 3.1 |
+| C3 heavy death penalty | 2.6 |
+| C4 pure wave-1 + entropy | 3.0 |
+| C5 + 1-up bonus | 3.2 |
+| from-scratch (garbage vel) | 2.8 |
+| C6 velocity-fix + warm-start | 3.2 |
+| scratch2 velocity-fix + from-scratch | 2.8 |
+
+EVERYTHING caps at wave ~3 (2.6-3.2). Reward shaping, warm-start vs scratch,
+entropy, and the velocity fix all fail to move it. The ceiling is fundamental
+to this setup: PPO + 945-dim distance-ranked category-slot obs + MLP, on
+continuous Robotron from wave 1 with 2 lives. Death mode: grunts in waves 2-3.
+
+Conclusion: NOT a reward/training-recipe problem. The likely culprit is the
+OBS REPRESENTATION + policy (the distance-ranked slot encoding scrambles
+spatial structure; an MLP can't recover the geometry needed for evasion/
+wall-avoidance). Breaking it needs a representational/architectural change
+(spatial grid + CNN, or attention over entities, or recurrence) — a real build,
+not a knob. HELD for user decision; cheap experiments exhausted.
+
 PLATEAU: C1-C4 all wave ~3 despite civilian reward, mid-game bridge, death
 penalty, pure-wave-1, entropy. Common thread: policy dies at ~21k, just short
 of the 25k first bonus life — so the lives→depth flywheel never ignites. C5
