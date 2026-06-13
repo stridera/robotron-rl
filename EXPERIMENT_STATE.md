@@ -137,6 +137,88 @@ Quark variants $4DF2/$4FD5 were in _LIST1_SW (obs) but not ENTITY_TYPES, so
 missed the +50 spawner bonus. Added (effective link 26+). $0390 (73 deaths,
 wave 12) stays on the watchlist — prior ground truth says effect record.
 
+| #25 f80c865e | 3M | 12 | 1,724* | **203,125 ATH** | **16** | first 200k+ score; harvested 12× w15 + 4× w16 (base 200) |
+| #26 mygocn3a | 3M | 12 | 1,883* | **219,800 ATH** | **17** | Quark kill-bonus fix active; harvested 7× w16 + 10× w17 (base 300). ~1 wave/link cadence with auto-capture |
+| #27 e9kkbwxq | 3M | 12 | 1,533* | **234,850 ATH** | **18** | harvested 6× w17 + 9× w18 (base 400) |
+| #28 jcq8gooo | 3M | 12 | 1,719* | **247,275 ATH** | **19** | past run-128 python-gym score (241,475); harvested 9× w19 (base 500) |
+| #29 sbso7qy9 | 3M | 12 | 1,364* | **264,025 ATH** | **20** | fourth brain wave broken; harvested 8× w19 + 1× w20 (base 600). Next milestone: all-backend record 286,300 |
+| #30 y7u9q9v1 | 3M | 12 | 1,513* | **276,975 ATH** | **21** | wave 21 broken late; 1× w21 harvested (w5_741). Auto-capture min 20 kept for link 31 (w20 band still thin) |
+| #31 87dhxt52 | 3M | 12 | 1,543* | **283,325 ATH** | **22** | harvested w21 (857) + w22 (850); 3k from the all-backend record 286,300 |
+| #32 fuy8slt9 | 3M | 12 | 1,684* | **309,500 ATH** | **23** | **ALL-BACKEND RECORD BROKEN** (was 286,300, python gym #97) — and on real ROM dynamics. Harvested 2× w21, 2× w22, 1× w23 (base 900) |
+| #33 wkmqvxfy | 3M | 12 | 1,459* | **344,225 ATH** | **25** | +2 waves (24 + brain wave 25); 17 states harvested incl. 12× w24 (base 1000). Quarter-way to wave 100 |
+| #34 ubllx7fk | 3M | 12 | 2,102* | **353,200 ATH** | **26** | chain-best ep_rew; ~40 states harvested (mostly w24; w25 1117, w26 1142, base 1100). fps ~430-460 at depth (entity load, not a fault) |
+| #35 67ywmiz1 | 3M | 12 | 1,945* | **365,725 ATH** | **28** | +2 waves again; harvested w25-28 incl. w28 seed 1243 (base 1200) |
+| #36 va530q4s | 3M | 12 | 2,056* | **379,000 ATH** | 28 | no new wave but +13k score; w28 band enriched to 4 seeds (base 1300) |
+| #37 k1cqqfc1 | 3M | 12 | 1,720* | **386,650 ATH** | **29** | wave 29 broken late (seed 1409); 8 more w28 states (base 1400) |
+| #38 88ir32b3 | 3M | 12 | 1,760* | **389,075 ATH** | 29 | flat wave; enriched w29 band to 5 seeds (1409,1508,1532,1548,1580). Link 39 weights them 3× for the wave-30 (6th brain wave) push |
+
+## 2026-06-12 — CRITICAL: continuous wave-1 runs reach only wave ~3 (user-asked)
+
+User asked the decisive question for hardware deployment: can the chain head
+actually play 1→29 in ONE continuous game? `mame_gym/eval_continuous.py` runs
+the head from a true wave-1 boot (full lives, NO save-state resets) to death.
+
+Link-38 head (save-state ATH 389,075 / wave 29), 15 stochastic runs:
+**wave reached mean 3.1, median 3, max 5; score mean ~10,200.**
+
+So the 389k/wave-29 ATH is a SAVE-STATE artifact — those episodes start from a
+deep state with ~370k score preloaded, play one wave, die. Continuous marathon
+ability is ~wave 3 / ~10k. The ladder built **wave specialists, not a marathon
+player.**
+
+Root cause (two compounding effects):
+1. Reset pool is ~98% deep save states; wave-1 continuous play gets ~2%
+   representation across 38 links → catastrophic forgetting of the early game.
+2. Save-state episodes START AT 1 LIFE and end on death, so the value function
+   never learns lives have FUTURE value. The policy learned myopic
+   life-spending ("clear THIS wave at any cost"), which burns the life stack
+   fast in a marathon. This is structural, not just forgetting.
+
+Implication for the wave-100 goal: per-wave competence ≠ marathon. Need a
+"stitching" strategy. Options to discuss with user (NOT yet acted on):
+ A. Final continuous-play phase: heavily weight/exclusive wave-1 full-lives
+    starts so the policy re-learns to chain waves + value lives.
+ B. Multi-life save states + longer episode horizon so lives gain future value.
+ C. Mixed pool: keep frontier competence but add a large fraction of
+    full-lives starts (wave 1 + deep) with extended horizon.
+ D. Eval-gate every link on continuous wave-1 performance, not just frontier
+    reach, so the chain optimizes the metric that matters for hardware.
+Tooling added: `mame_gym/eval_continuous.py` (stochastic + `det` mode).
+Deterministic confirm (6 runs): mean wave 2.7 — not a sampling artifact.
+
+## 2026-06-12 — PIVOT to continuous-play training (user: "do whatever best for 1-100")
+
+User endorsed the pivot and added the key lever: **1-ups come from score, and
+the dominant score source is rescuing civilians** — so a marathon player MUST
+collect the family, which the chain never learned to prioritize.
+
+Changes (link C1, warm-started from competent head 88ir32b3):
+1. **Civilian-rescue reward** (`mame_robotron_env.py`): +75 per family member
+   that vanishes WITH a >=900 score jump (rescue band 1000-5000; Hulk/Brain
+   kills score 0 so they don't trigger it). Makes rescue first-class.
+2. **Full-lives continuous pool**: ~72% wave-1 boot (2 lives) so the value
+   function learns lives have FUTURE value (the structural fix), + a wave-6..29
+   retention spread so per-wave competence isn't forgotten.
+3. **auto_capture_min_wave=5, base 2000**: rebuild a CLEAN deep-state library
+   (full-lives where reached) as continuous reach extends.
+Success metric is now `eval_continuous` (wave reached from a true wave-1 boot),
+NOT frontier ATH. Link 39 (frontier ladder, had hit wave 30) was stopped to
+free compute for the pivot — frontier depth is no longer the bottleneck; the
+competent head already knows every wave band, it lacks the marathon glue.
+
+## 2026-06-12 — BUG: save-state index wrapped at 256 (found during pivot setup)
+
+`mame_bridge.py` sent the reset/save state index as ONE byte
+(`state_idx & 0xFF`), so any index >=256 wrapped mod 256. Every auto-capture
+base >=256 (links 24-39: bases 200/300/.../1600) silently aliased onto low
+indices, colliding with each other AND overwriting hand-ladder states (w5_1 is
+now wave 16, not 5; w5_12 is wave 29). So the recent "frontier-weighted" reset
+pools were loading a collision-corrupted subset — the chain still climbed to
+wave 30, which speaks to robustness, but the pool was muddier than logged.
+Fix: index now 2 bytes (b2 high, b3 low) in both `mame_bridge.py` and
+`robotron_server.lua` (b3 was free — only STEP uses it, as fire-dir).
+Roundtrip-tested at index 500. Existing w5_0..253 still load correctly.
+
 ## 2026-06-11 — REBOOT WIPED /tmp: save-state pool lost, link 16 cut short
 
 Host went down ~03:30 (rebooted 09:14). `/tmp/mame_states` held the ENTIRE

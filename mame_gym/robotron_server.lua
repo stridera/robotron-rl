@@ -126,14 +126,17 @@ local function read_and_dispatch()
     if c == CMD_QUIT then
         manager.machine:exit()
     elseif c == CMD_RESET then
-        if b2 and b2 > 0 then
-            manager.machine:load("w5_" .. b2)
+        -- idx is 2 bytes (b2 high, b3 low): indices >=256 used to wrap mod 256
+        -- and collide in the save-state pool. b3 is free here (only STEP uses it).
+        local idx = b2 * 256 + b3
+        if idx > 0 then
+            manager.machine:load("w5_" .. idx)
         else
             manager.machine:load(RESET_STATE)
         end
         state = "loading"; settle = 3
     elseif c == CMD_SAVE then
-        manager.machine:save("w5_" .. b2)
+        manager.machine:save("w5_" .. (b2 * 256 + b3))
         state = "loading"; settle = 3   -- reuse settle->checkpoint path to reply
     elseif c == CMD_SNAP then
         -- Screenshot to the MAME snapshot dir (paired with the obs the

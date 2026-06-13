@@ -110,15 +110,17 @@ class MameBridge:
         """Load a saved state and return its observation.
         state_idx 0 = boot (wave-1) state; N>0 = saved state 'w5_N'."""
         try:
-            self._sock.sendall(bytes([CMD_RESET, state_idx & 0xFF, 0, 0]))
+            # idx as 2 bytes (high, low). Was 1 byte → indices >=256 wrapped
+            # mod 256 and aliased states in the pool (fixed 2026-06-12).
+            self._sock.sendall(bytes([CMD_RESET, (state_idx >> 8) & 0xFF, state_idx & 0xFF, 0]))
             return self._recv_obs()
         except (TimeoutError, ConnectionError, OSError):
             self._recover()
             return self._safe_reset()
 
     def save_state(self, state_idx: int):
-        """Save the current machine state as 'w5_<idx>' (idx 1-255)."""
-        self._sock.sendall(bytes([CMD_SAVE, state_idx & 0xFF, 0, 0]))
+        """Save the current machine state as 'w5_<idx>' (2-byte idx, 1-65535)."""
+        self._sock.sendall(bytes([CMD_SAVE, (state_idx >> 8) & 0xFF, state_idx & 0xFF, 0]))
         return self._recv_obs()
 
     def snapshot(self):

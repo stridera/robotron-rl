@@ -35,11 +35,12 @@ from mame_obs import classify_sw
 _SPAWNER_NAMES = ("Spheroid", "Quark")
 _SHOOTER_NAMES = ("Enforcer", "Tank")
 _BRAIN_NAMES   = ("Brain", "Brain (alt)")
+_FAMILY_NAMES  = ("Mikey", "Mom", "Dad")   # rescuable humans (the point source)
 _SLOT_BASE, _SLOT_STRIDE, _SLOT_COUNT = 10, 24, 101
 
 
 def _count_strategic(packet: bytes):
-    spawner = shooter = brain = 0
+    spawner = shooter = brain = family = 0
     for i in range(_SLOT_COUNT):
         off = _SLOT_BASE + i * _SLOT_STRIDE
         sw = (packet[off + 4] << 8) | packet[off + 5]
@@ -49,7 +50,8 @@ def _count_strategic(packet: bytes):
         if name in _SPAWNER_NAMES: spawner += 1
         elif name in _SHOOTER_NAMES: shooter += 1
         elif name in _BRAIN_NAMES: brain += 1
-    return spawner, shooter, brain
+        elif name in _FAMILY_NAMES: family += 1
+    return spawner, shooter, brain, family
 
 
 # ── Death forensics ────────────────────────────────────────────────────────
@@ -128,7 +130,7 @@ class MameRobotronEnv(gym.Env):
         self._last_score = 0
         self._last_lives = 0
         self._last_wave = 0
-        self._last_spawn = self._last_shoot = self._last_brain = 0
+        self._last_spawn = self._last_shoot = self._last_brain = self._last_family = 0
         self._last_packet: bytes | None = None   # raw obs packet (diagnostics)
         # Short packet history for death forensics. Mutual-destruction kills
         # (player walks into a grunt: BOTH die) remove the killer from the
@@ -216,7 +218,7 @@ class MameRobotronEnv(gym.Env):
         self._last_score = h["score"]
         self._last_lives = h["lives"]
         self._last_wave = h["wave"]
-        self._last_spawn, self._last_shoot, self._last_brain = _count_strategic(packet)
+        self._last_spawn, self._last_shoot, self._last_brain, self._last_family = _count_strategic(packet)
         self._auto_settle = -1
         self._auto_saved_waves = set()
         obs = self._obs_builder(packet).astype(np.float32)
@@ -232,7 +234,7 @@ class MameRobotronEnv(gym.Env):
             obs = self._obs_builder(packet).astype(np.float32)
             h = parse_header(packet)
             self._last_score, self._last_lives, self._last_wave = h["score"], h["lives"], h["wave"]
-            self._last_spawn, self._last_shoot, self._last_brain = _count_strategic(packet)
+            self._last_spawn, self._last_shoot, self._last_brain, self._last_family = _count_strategic(packet)
             return obs, 0.0, True, False, {"score": h["score"], "lives": h["lives"],
                                            "wave": h["wave"], "recovered": True}
         h = parse_header(packet)
@@ -276,11 +278,20 @@ class MameRobotronEnv(gym.Env):
                 elif wave >= 7: reward += 3000.0
                 elif wave >= 5: reward += 1000.0
 
-        spawn, shoot, brain = _count_strategic(packet)
+        spawn, shoot, brain, family = _count_strategic(packet)
         if not terminated and score_delta > 0:
             reward += 50.0 * max(0, self._last_spawn - spawn)
             reward += 20.0 * max(0, self._last_shoot - shoot)
             reward += 100.0 * max(0, self._last_brain - brain)
+            # Civilian rescue: a family member vanishing WITH a score jump in the
+            # rescue-bonus band (1000-5000) is a pickup, not a Hulk/Brain kill
+            # (those score 0). Rescues are the dominant point source and thus the
+            # 1-up engine that sustains a continuous 1->N marathon, so reward them
+            # as a first-class objective rather than diffuse score_delta. (Rare
+            # false positive: a family death in the same 4-frame step as a >=900
+            # enemy-kill score; acceptable.)
+            if score_delta >= 900:
+                reward += 75.0 * max(0, self._last_family - family)
 
         truncated = False
 
@@ -313,7 +324,7 @@ class MameRobotronEnv(gym.Env):
                               f"wave={wave} score={score} lives={lives}", flush=True)
             info = {"score": score, "lives": lives, "wave": wave}
             self._last_score, self._last_lives, self._last_wave = score, lives, wave
-            self._last_spawn, self._last_shoot, self._last_brain = spawn, shoot, brain
+            self._last_spawn, self._last_shoot, self._last_brain, self._last_family = spawn, shoot, brain, family
 
         obs = self._obs_builder(packet).astype(np.float32)
         return obs, reward, terminated, truncated, info
