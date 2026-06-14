@@ -171,9 +171,11 @@ class MameBridge:
 
 
 def parse_obs_header(obs: bytes) -> dict:
-    wave, lives, s5, s6, s7, px, pxsub, py, pdir, dead = obs[:HDR_LEN]
+    # byte 8 = current_player ($983F), byte 9 = game_state ($9859). See
+    # mame_obs.parse_header (authoritative); kept here for standalone use.
+    wave, lives, s5, s6, s7, px, pxsub, py, cur_player, game_state = obs[:HDR_LEN]
     score = ((s5 >> 4) * 10 + (s5 & 0xF)) * 10000 + \
             ((s6 >> 4) * 10 + (s6 & 0xF)) * 100 + \
             ((s7 >> 4) * 10 + (s7 & 0xF))
     return {"wave": wave, "lives": lives, "score": score,
-            "player_x": px, "player_y": py, "dir": pdir, "dead": dead}
+            "player_x": px, "player_y": py, "game_state": game_state}

@@ -101,7 +101,7 @@ local function pack_obs()
         mem:read_u8(0xBDED), mem:read_u8(0xBDEC),
         mem:read_u8(0xBDE5), mem:read_u8(0xBDE6), mem:read_u8(0xBDE7),
         mem:read_u8(0x9864), mem:read_u8(0x9865), mem:read_u8(0x9866),
-        mem:read_u8(0x983F), mem:read_u8(0x9848))
+        mem:read_u8(0x983F), mem:read_u8(0x9859))   -- byte9 = game_state ($9859); $1B=KILL_PLAYER, $FF=game over
     local bytes = {}
     for i = 0, SLOT_BYTES - 1 do bytes[i + 1] = string.char(mem:read_u8(SLOT_BASE + i)) end
     return hdr .. table.concat(bytes) .. walk_lists()

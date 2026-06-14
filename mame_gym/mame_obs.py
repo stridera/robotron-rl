@@ -214,9 +214,15 @@ class MameObsBuilder:
 
 
 def parse_header(packet: bytes) -> dict:
-    wave, lives, s5, s6, s7, px, pxsub, py, pdir, dead = packet[:10]
+    # byte layout (robotron_server.lua): [wave($BDED), lives($BDEC),
+    # sc5-7($BDE5-7 BCD), pX($9864), $9865(unused), pY($9866),
+    # cur_player($983F), game_state($9859)]. Audited vs the annotated ASM
+    # 2026-06-13: byte 8 was mislabeled "dir" (it's current_player, unused) and
+    # byte 9 was mislabeled "dead" (was $9848 collision-flag; now $9859
+    # game_state — 0=play, 0x1B=KILL_PLAYER death, 0x7F/0x19=transition).
+    wave, lives, s5, s6, s7, px, pxsub, py, cur_player, game_state = packet[:10]
     score = ((s5 >> 4) * 10 + (s5 & 0xF)) * 10000 + \
             ((s6 >> 4) * 10 + (s6 & 0xF)) * 100 + \
             ((s7 >> 4) * 10 + (s7 & 0xF))
     return {"wave": wave, "lives": lives, "score": score,
-            "player_x": px, "player_y": py, "dir": pdir, "dead": dead}
+            "player_x": px, "player_y": py, "game_state": game_state}

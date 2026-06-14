@@ -146,7 +146,7 @@ class MameRobotronEnv(gym.Env):
         self._last_lives = 0
         self._last_wave = 0
         self._last_spawn = self._last_shoot = self._last_brain = self._last_family = 0
-        self._last_dead = 0   # $9848 being-killed flag, prev step (death edge detection)
+        self._last_gs = 0   # game_state ($9859) prev step, for death-edge detection
         self._last_packet: bytes | None = None   # raw obs packet (diagnostics)
         # Short packet history for death forensics. Mutual-destruction kills
         # (player walks into a grunt: BOTH die) remove the killer from the
@@ -235,7 +235,7 @@ class MameRobotronEnv(gym.Env):
         self._last_lives = h["lives"]
         self._last_wave = h["wave"]
         self._last_spawn, self._last_shoot, self._last_brain, self._last_family = _count_strategic(packet)
-        self._last_dead = h["dead"]
+        self._last_gs = h["game_state"]
         self._auto_settle = -1
         self._auto_saved_waves = set()
         obs = self._obs_builder(packet).astype(np.float32)
@@ -256,17 +256,19 @@ class MameRobotronEnv(gym.Env):
                                            "wave": h["wave"], "recovered": True}
         h = parse_header(packet)
         score, lives, wave = h["score"], h["lives"], h["wave"]
-        dead = h["dead"]
-        # A REAL death needs BOTH signals: the `lives` counter decrements AND the
-        # $9848 being-killed flag is set. Neither alone is reliable:
-        #   - `lives` reads spurious transient values for ~15 steps after every
-        #     wave entry (e.g. 1->2->1 into wave 2, dead-flag 0 throughout), so
-        #     lives-alone fired FALSE death penalties (and, post-C5, false +250
-        #     1-ups) on every wave advance — the root cause of the wave-3 wall,
-        #     where random and trained agents both capped.
-        #   - the dead-flag also has 1-step flicker pulses with no life lost.
-        # Their conjunction is clean: real deaths decrement lives WHILE dying.
-        real_death = (lives < self._last_lives) and (dead != 0)
+        # game_state ($9859, byte 9). From the annotated 6809 ASM (robomame.asm):
+        #   0x00 = active play
+        #   0x1B = KILL_PLAYER ("player has hit something") — the EXACT death
+        #          instant, fires once per death (verified)
+        #   0x7F / 0x19 = wave-transition + death-animation states
+        # The earlier "dead" signal ($9848) was a MISREAD — it is actually the
+        # collision-detection-active flag, not death. And `lives` ($BDEC) reads
+        # spurious transient values during the 0x7F wave-transition window
+        # (1->2->1; ASM $2A9A INCs lives there) — which fired the false death
+        # penalty on every wave advance that built the wave-3 wall. game_state ==
+        # 0x1B is flicker-immune and fires at the moment of death.
+        gs = h["game_state"]
+        died = (gs == 0x1B) and (self._last_gs != 0x1B)
         score_delta = score - self._last_score
         # Terminal: out of lives, OR the wave register made a non-sequential
         # move (gameplay only ever holds or increments by 1) — that means the
@@ -275,8 +277,8 @@ class MameRobotronEnv(gym.Env):
         # episodes bleed into attract mode and collect spurious reward.
         terminated = (lives == 0) or not (self._last_wave <= wave <= self._last_wave + 1)
 
-        # Death forensics: log every real death or terminal.
-        if real_death or terminated:
+        # Death forensics: log every real death (game_state -> KILL_PLAYER) or terminal.
+        if died or terminated:
             self._log_death(packet, self._last_wave, self._last_score, terminated)
 
         # Maintain pre-death history AFTER forensics (3 most recent packets).
@@ -285,26 +287,21 @@ class MameRobotronEnv(gym.Env):
             self._pkt_history.pop(0)
         self._last_packet = packet
 
-        # Reward shaping (dead-flag based; the lives counter is unreliable — see
-        # the `died` comment above). Three cases:
-        #   terminal      -> death penalty only (attract-mode packet is garbage)
-        #   dead (dying)  -> no control; -20 ONCE on the death edge, else 0
-        #   alive         -> score + survival + wave-clear + kill/rescue bonuses
+        # Reward shaping (game_state based). Cases:
+        #   terminal        -> death penalty only (attract-mode packet is garbage)
+        #   died (gs->0x1B) -> -20 at the death instant
+        #   active (gs==0)  -> score + survival + kill/rescue bonuses
+        #   transition      -> 0 (gs 0x7F/0x19: no control; lives flickers here)
+        # Wave-clear bonus is applied on the wave++ edge regardless of gs, since
+        # the advance itself registers during the 0x7F transition.
         spawn, shoot, brain, family = _count_strategic(packet)
         if terminated:
             reward = -20.0
-        elif dead != 0:
-            reward = -20.0 if real_death else 0.0
-        else:
+        elif died:
+            reward = -20.0
+        elif gs == 0x00:
             reward = score_delta / 10.0
-            reward += 0.3 * max(1, int(wave))   # survival (alive frames only)
-            # Real play advances exactly one wave at a time; a jump >1 means
-            # we're reading a non-gameplay screen — no bonus.
-            if wave == self._last_wave + 1:
-                reward += 250.0 * wave
-                if wave >= 10: reward += 8000.0
-                elif wave >= 7: reward += 3000.0
-                elif wave >= 5: reward += 1000.0
+            reward += 0.3 * max(1, int(wave))   # survival (active play only)
             if score_delta > 0:
                 reward += 50.0 * max(0, self._last_spawn - spawn)
                 reward += 20.0 * max(0, self._last_shoot - shoot)
@@ -314,6 +311,15 @@ class MameRobotronEnv(gym.Env):
                 # kill (those score 0) — the dominant point source / 1-up engine.
                 if score_delta >= 900:
                     reward += 75.0 * max(0, self._last_family - family)
+        else:
+            reward = 0.0   # wave-transition / death-animation: no agent control
+        # Real wave advance (exactly +1) — reward it regardless of gs. A jump >1
+        # means a non-gameplay screen (handled by `terminated`).
+        if not terminated and wave == self._last_wave + 1:
+            reward += 250.0 * wave
+            if wave >= 10: reward += 8000.0
+            elif wave >= 7: reward += 3000.0
+            elif wave >= 5: reward += 1000.0
 
         truncated = False
 
@@ -347,7 +353,7 @@ class MameRobotronEnv(gym.Env):
             info = {"score": score, "lives": lives, "wave": wave}
             self._last_score, self._last_lives, self._last_wave = score, lives, wave
             self._last_spawn, self._last_shoot, self._last_brain, self._last_family = spawn, shoot, brain, family
-        self._last_dead = dead   # track every step (incl. dead frames) for edge detection
+        self._last_gs = gs   # track game_state every step for death-edge detection
 
         obs = self._obs_builder(packet).astype(np.float32)
         return obs, reward, terminated, truncated, info
