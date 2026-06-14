@@ -30,27 +30,29 @@ from mame_obs import MameObsBuilder, parse_header
 # Kill-bonus counting uses the census-derived classifier so animation-frame
 # SW changes don't read as kills (exact-match counters awarded phantom kill
 # bonuses every time a spheroid/enforcer animated to a variant SW).
-from mame_obs import classify_sw
+from mame_obs import classify_sw, iter_entities
 
 _SPAWNER_NAMES = ("Spheroid", "Quark")
 _SHOOTER_NAMES = ("Enforcer", "Tank")
 _BRAIN_NAMES   = ("Brain", "Brain (alt)")
-_FAMILY_NAMES  = ("Mikey", "Mom", "Dad")   # rescuable humans (the point source)
-_SLOT_BASE, _SLOT_STRIDE, _SLOT_COUNT = 10, 24, 101
+_FAMILY_LIST_ID = 2   # the game's family linked list ($981F); any member = a human
 
 
 def _count_strategic(packet: bytes):
+    """Count spawners / shooters / brains / family from the CORRECT typed entity
+    list (the game's own per-category linked lists, same source as the 945-dim
+    obs). The previous version read a flat '$98D4 slot pool' which the ASM audit
+    showed overlaps font-render memory ($98D0-$98D2) — i.e. garbage, so the
+    family count (civilian-rescue reward) and kill bonuses were unreliable."""
     spawner = shooter = brain = family = 0
-    for i in range(_SLOT_COUNT):
-        off = _SLOT_BASE + i * _SLOT_STRIDE
-        sw = (packet[off + 4] << 8) | packet[off + 5]
-        if sw == 0:
+    for addr, lid, sw, x, y in iter_entities(packet):
+        if lid == _FAMILY_LIST_ID:
+            family += 1
             continue
         name = classify_sw(sw)
         if name in _SPAWNER_NAMES: spawner += 1
         elif name in _SHOOTER_NAMES: shooter += 1
         elif name in _BRAIN_NAMES: brain += 1
-        elif name in _FAMILY_NAMES: family += 1
     return spawner, shooter, brain, family
 
 
@@ -308,9 +310,15 @@ class MameRobotronEnv(gym.Env):
                 reward += 100.0 * max(0, self._last_brain - brain)
                 # Civilian rescue: a family member vanishing WITH a score jump in
                 # the rescue-bonus band (1000-5000) is a pickup, not a Hulk/Brain
-                # kill (those score 0) — the dominant point source / 1-up engine.
+                # kill (those score 0). Rescues are the dominant point source and
+                # thus the 1-up engine that sustains a marathon — and the
+                # "gaining a life is good" signal is too sparse/distant for the
+                # policy to credit, so reward the gathering itself HIGHLY and
+                # densely (user-directed 2026-06-13). 250 flat + the ~100-500
+                # from score makes a rescue the single most valuable action,
+                # short of a wave clear, pulling the policy toward the humans.
                 if score_delta >= 900:
-                    reward += 75.0 * max(0, self._last_family - family)
+                    reward += 250.0 * max(0, self._last_family - family)
         else:
             reward = 0.0   # wave-transition / death-animation: no agent control
         # Real wave advance (exactly +1) — reward it regardless of gs. A jump >1
