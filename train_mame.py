@@ -160,6 +160,8 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
 
     out_dir = Path(f"models/{run.id}")
     (out_dir / "checkpoints").mkdir(parents=True, exist_ok=True)
+    print(f"OUTPUT_DIR: {out_dir}  (eval this run's final_model.zip from here, "
+          f"NOT the --bc-checkpoint dir)", flush=True)
     callbacks = [
         MameMetricsCallback(),
         VecNormSaver(envs, str(out_dir / "vec_normalize.pkl"), freq=100_000),

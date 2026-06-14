@@ -313,8 +313,12 @@ class MameRobotronEnv(gym.Env):
                 # thus the 1-up engine for a marathon; the "gaining a life is
                 # good" signal is too sparse for the policy to credit, so reward
                 # the gathering itself HIGHLY (user-directed 2026-06-13).
+                # 150 flat: enough to make the agent value humans without the
+                # suicidal over-prioritization that 250 caused (fixed5 regressed
+                # to mean wave 1.9 with many wave-1 deaths — chasing civilians
+                # into grunt clusters). The grab-vs-survive balance is delicate.
                 if score_delta >= 900:
-                    rc = 250.0 * max(0, self._last_family - family)
+                    rc = 150.0 * max(0, self._last_family - family)
                     if rc: parts["RESCUE"] = rc
                     reward += rc
         else:
