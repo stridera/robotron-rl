@@ -22,6 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from collections import deque
+
 import numpy as np
 import imageio.v2 as imageio
 from PIL import Image, ImageDraw
@@ -66,6 +68,11 @@ def main():
     venv.training = False; venv.norm_reward = False
     model = PPO.load(MODEL, env=venv, device="cpu")
 
+    # Recent NOTABLE reward events (rescue / wave-clear / death / kills), newest
+    # first — so we can verify the right rewards fire against the gameplay.
+    NOTABLE = {"death", "RESCUE", "WAVE_CLEAR", "spawner_kill", "shooter_kill", "brain_kill"}
+    reward_log = deque(maxlen=16)
+
     obs = venv.reset()
     frames = []
     for step in range(MAX_STEPS):
@@ -73,7 +80,11 @@ def main():
         move, fire = int(action[0][0]) + 1, int(action[0][1]) + 1
         before = set(SNAP_DIR.glob("*.png"))
         pkt = env._last_packet
-        obs, _, dones, infos = venv.step(action)
+        obs, rews, dones, infos = venv.step(action)
+        parts = infos[0].get("reward_parts", {})
+        notable = {k: v for k, v in parts.items() if k in NOTABLE}
+        if notable:
+            reward_log.appendleft((step, float(rews[0]), notable))
         env._bridge.snapshot()
         png = None
         for _ in range(30):
@@ -104,6 +115,14 @@ def main():
         d.line([ppx, ppy, ppx + fr[0] * 26, ppy + fr[1] * 26], fill="red", width=2)
         d.text((6, 4), f"W{h['wave']} L{h['lives']} S{h['score']} gs={h['game_state']:#04x} "
                        f"move={move} fire={fire}", fill="white")
+        # recent reward events stacked at top-right (newest first)
+        W = img.size[0]
+        d.text((W - 250, 4), "recent rewards:", fill="white")
+        for i, (s, tot, nb) in enumerate(reward_log):
+            lbl = " ".join(f"{k}+{int(v)}" if v >= 0 else f"{k}{int(v)}" for k, v in nb.items())
+            col = ("red" if "death" in nb else "yellow" if "RESCUE" in nb
+                   else "cyan" if "WAVE_CLEAR" in nb else "magenta")
+            d.text((W - 250, 20 + i * 14), f"s{s} {lbl}", fill=col)
         frames.append(np.asarray(img))
         if dones[0]: break
     venv.close()

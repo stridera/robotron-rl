@@ -297,37 +297,43 @@ class MameRobotronEnv(gym.Env):
         # Wave-clear bonus is applied on the wave++ edge regardless of gs, since
         # the advance itself registers during the 0x7F transition.
         spawn, shoot, brain, family = _count_strategic(packet)
+        parts = {}   # labeled reward breakdown (for the overlay video / debugging)
         if terminated:
-            reward = -20.0
+            reward = -20.0; parts["death"] = -20.0
         elif died:
-            reward = -20.0
+            reward = -20.0; parts["death"] = -20.0
         elif gs == 0x00:
             reward = score_delta / 10.0
-            reward += 0.3 * max(1, int(wave))   # survival (active play only)
+            if score_delta: parts["score"] = round(score_delta / 10.0, 1)
+            surv = 0.3 * max(1, int(wave)); reward += surv; parts["survive"] = round(surv, 1)
             if score_delta > 0:
-                reward += 50.0 * max(0, self._last_spawn - spawn)
-                reward += 20.0 * max(0, self._last_shoot - shoot)
-                reward += 100.0 * max(0, self._last_brain - brain)
+                sp = 50.0 * max(0, self._last_spawn - spawn)
+                sh = 20.0 * max(0, self._last_shoot - shoot)
+                br = 100.0 * max(0, self._last_brain - brain)
+                if sp: parts["spawner_kill"] = sp
+                if sh: parts["shooter_kill"] = sh
+                if br: parts["brain_kill"] = br
+                reward += sp + sh + br
                 # Civilian rescue: a family member vanishing WITH a score jump in
                 # the rescue-bonus band (1000-5000) is a pickup, not a Hulk/Brain
                 # kill (those score 0). Rescues are the dominant point source and
-                # thus the 1-up engine that sustains a marathon — and the
-                # "gaining a life is good" signal is too sparse/distant for the
-                # policy to credit, so reward the gathering itself HIGHLY and
-                # densely (user-directed 2026-06-13). 250 flat + the ~100-500
-                # from score makes a rescue the single most valuable action,
-                # short of a wave clear, pulling the policy toward the humans.
+                # thus the 1-up engine for a marathon; the "gaining a life is
+                # good" signal is too sparse for the policy to credit, so reward
+                # the gathering itself HIGHLY (user-directed 2026-06-13).
                 if score_delta >= 900:
-                    reward += 250.0 * max(0, self._last_family - family)
+                    rc = 250.0 * max(0, self._last_family - family)
+                    if rc: parts["RESCUE"] = rc
+                    reward += rc
         else:
             reward = 0.0   # wave-transition / death-animation: no agent control
         # Real wave advance (exactly +1) — reward it regardless of gs. A jump >1
         # means a non-gameplay screen (handled by `terminated`).
         if not terminated and wave == self._last_wave + 1:
-            reward += 250.0 * wave
-            if wave >= 10: reward += 8000.0
-            elif wave >= 7: reward += 3000.0
-            elif wave >= 5: reward += 1000.0
+            wc = 250.0 * wave
+            if wave >= 10: wc += 8000.0
+            elif wave >= 7: wc += 3000.0
+            elif wave >= 5: wc += 1000.0
+            reward += wc; parts["WAVE_CLEAR"] = wc
 
         truncated = False
 
@@ -335,7 +341,8 @@ class MameRobotronEnv(gym.Env):
         # (wave=171, BCD score junk). Report the last VALID gameplay values in
         # info so metrics (highest_score / highest_wave) stay truthful.
         if terminated:
-            info = {"score": self._last_score, "lives": 0, "wave": self._last_wave}
+            info = {"score": self._last_score, "lives": 0, "wave": self._last_wave,
+                    "reward_parts": parts}
         else:
             # Auto-capture: entering a frontier wave arms a settle countdown;
             # save once the transition flash is over and the player isn't
@@ -358,7 +365,7 @@ class MameRobotronEnv(gym.Env):
                         self._auto_saved_waves.add(wave)
                         print(f"[auto-capture rank {self._rank}] saved w5_{idx}: "
                               f"wave={wave} score={score} lives={lives}", flush=True)
-            info = {"score": score, "lives": lives, "wave": wave}
+            info = {"score": score, "lives": lives, "wave": wave, "reward_parts": parts}
             self._last_score, self._last_lives, self._last_wave = score, lives, wave
             self._last_spawn, self._last_shoot, self._last_brain, self._last_family = spawn, shoot, brain, family
         self._last_gs = gs   # track game_state every step for death-edge detection
