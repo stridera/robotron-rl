@@ -747,3 +747,23 @@ Recording gameplay videos (videos/) for the user to watch and spot the issue
 (their random-agent insight was the key unlock). Still-open: whether early game
 is genuinely this hard for model-free RL with 2 lives + frameskip-4, or a subtle
 issue a human will see in the video.
+
+## 2026-06-13 — Entropy fix + verified rewards + high civilian reward
+
+User observation ("plays basically random") -> checked policy entropy: fixed1
+(ent_coef 0.02) ended at 3.81/4.16 = 92% of fully random. The value function
+learned (explained_var 0.83) but the entropy bonus kept the policy from
+committing. ROOT of the "trained ≈ random" puzzle.
+
+fixed3 (ent_coef 0.005, warm-start fixed1): entropy fell to 3.25, eval mean wave
+2.5 -> 2.9, scores up (max 21,400). The policy commits and plays better.
+
+Overlay video (record_video_overlay.py, now with a reward-event stack) verifies
+end-to-end on a wave-3 run: perception boxes match sprites (Hulk/Elec/Enfo
+labels correct), action arrows render, and the reward stack shows the RIGHT
+events firing — WAVE_CLEAR +500/+750, RESCUE +250 (the corrected civilian count
+works!), spawner_kill +50, death -20. Videos in videos/.
+
+Also fixed: _count_strategic read the $98D4 font-memory garbage -> now uses the
+typed entity list; civilian rescue 75 -> 250 (user-directed). fixed4 (warm-start
+fixed3, ent 0.005, high civilian reward) launched to push civilian gathering.
