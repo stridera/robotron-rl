@@ -27,3 +27,4 @@ demos/
 runs_old/
 *.log
 mame_gym/robomame.asm
+videos/
