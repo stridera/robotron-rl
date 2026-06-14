@@ -146,6 +146,7 @@ class MameRobotronEnv(gym.Env):
         self._last_lives = 0
         self._last_wave = 0
         self._last_spawn = self._last_shoot = self._last_brain = self._last_family = 0
+        self._last_dead = 0   # $9848 being-killed flag, prev step (death edge detection)
         self._last_packet: bytes | None = None   # raw obs packet (diagnostics)
         # Short packet history for death forensics. Mutual-destruction kills
         # (player walks into a grunt: BOTH die) remove the killer from the
@@ -234,6 +235,7 @@ class MameRobotronEnv(gym.Env):
         self._last_lives = h["lives"]
         self._last_wave = h["wave"]
         self._last_spawn, self._last_shoot, self._last_brain, self._last_family = _count_strategic(packet)
+        self._last_dead = h["dead"]
         self._auto_settle = -1
         self._auto_saved_waves = set()
         obs = self._obs_builder(packet).astype(np.float32)
@@ -254,6 +256,17 @@ class MameRobotronEnv(gym.Env):
                                            "wave": h["wave"], "recovered": True}
         h = parse_header(packet)
         score, lives, wave = h["score"], h["lives"], h["wave"]
+        dead = h["dead"]
+        # A REAL death needs BOTH signals: the `lives` counter decrements AND the
+        # $9848 being-killed flag is set. Neither alone is reliable:
+        #   - `lives` reads spurious transient values for ~15 steps after every
+        #     wave entry (e.g. 1->2->1 into wave 2, dead-flag 0 throughout), so
+        #     lives-alone fired FALSE death penalties (and, post-C5, false +250
+        #     1-ups) on every wave advance — the root cause of the wave-3 wall,
+        #     where random and trained agents both capped.
+        #   - the dead-flag also has 1-step flicker pulses with no life lost.
+        # Their conjunction is clean: real deaths decrement lives WHILE dying.
+        real_death = (lives < self._last_lives) and (dead != 0)
         score_delta = score - self._last_score
         # Terminal: out of lives, OR the wave register made a non-sequential
         # move (gameplay only ever holds or increments by 1) — that means the
@@ -262,8 +275,8 @@ class MameRobotronEnv(gym.Env):
         # episodes bleed into attract mode and collect spurious reward.
         terminated = (lives == 0) or not (self._last_wave <= wave <= self._last_wave + 1)
 
-        # Death forensics: log every life loss (uses pre-death packet history).
-        if lives < self._last_lives or terminated:
+        # Death forensics: log every real death or terminal.
+        if real_death or terminated:
             self._log_death(packet, self._last_wave, self._last_score, terminated)
 
         # Maintain pre-death history AFTER forensics (3 most recent packets).
@@ -272,30 +285,19 @@ class MameRobotronEnv(gym.Env):
             self._pkt_history.pop(0)
         self._last_packet = packet
 
-        # Reward shaping. On the terminal step the game has flipped to attract
-        # mode ($BDED garbage), so terminal gets the death penalty ONLY (no
-        # wave/score deltas → no spurious suicide bonus).
-        # Death penalty -20: C3 tested a heavy penalty (-200/-75) and it made
-        # continuous play WORSE (mean wave 3.2→2.6, more early deaths) — a big
-        # negative terminal spike destabilized rather than taught caution.
-        # Reverted to the C1 value (best continuous result).
+        # Reward shaping (dead-flag based; the lives counter is unreliable — see
+        # the `died` comment above). Three cases:
+        #   terminal      -> death penalty only (attract-mode packet is garbage)
+        #   dead (dying)  -> no control; -20 ONCE on the death edge, else 0
+        #   alive         -> score + survival + wave-clear + kill/rescue bonuses
+        spawn, shoot, brain, family = _count_strategic(packet)
         if terminated:
             reward = -20.0
+        elif dead != 0:
+            reward = -20.0 if real_death else 0.0
         else:
             reward = score_delta / 10.0
-            if lives < self._last_lives:
-                reward += -20.0
-            elif lives > self._last_lives:
-                # Banked a bonus life (Robotron awards one at ~25k). This is the
-                # SNOWBALL TRIGGER for a marathon: more lives -> survive deeper
-                # -> rescue more -> more lives. C1-C4 stalled at wave ~3 because
-                # the policy dies (~21k) just short of the first bonus life and
-                # never starts the flywheel. Reward the 1-up directly so the
-                # value function pulls play toward crossing that threshold
-                # (2026-06-13).
-                reward += 250.0
-            else:
-                reward += 0.3 * max(1, int(wave))
+            reward += 0.3 * max(1, int(wave))   # survival (alive frames only)
             # Real play advances exactly one wave at a time; a jump >1 means
             # we're reading a non-gameplay screen — no bonus.
             if wave == self._last_wave + 1:
@@ -303,21 +305,15 @@ class MameRobotronEnv(gym.Env):
                 if wave >= 10: reward += 8000.0
                 elif wave >= 7: reward += 3000.0
                 elif wave >= 5: reward += 1000.0
-
-        spawn, shoot, brain, family = _count_strategic(packet)
-        if not terminated and score_delta > 0:
-            reward += 50.0 * max(0, self._last_spawn - spawn)
-            reward += 20.0 * max(0, self._last_shoot - shoot)
-            reward += 100.0 * max(0, self._last_brain - brain)
-            # Civilian rescue: a family member vanishing WITH a score jump in the
-            # rescue-bonus band (1000-5000) is a pickup, not a Hulk/Brain kill
-            # (those score 0). Rescues are the dominant point source and thus the
-            # 1-up engine that sustains a continuous 1->N marathon, so reward them
-            # as a first-class objective rather than diffuse score_delta. (Rare
-            # false positive: a family death in the same 4-frame step as a >=900
-            # enemy-kill score; acceptable.)
-            if score_delta >= 900:
-                reward += 75.0 * max(0, self._last_family - family)
+            if score_delta > 0:
+                reward += 50.0 * max(0, self._last_spawn - spawn)
+                reward += 20.0 * max(0, self._last_shoot - shoot)
+                reward += 100.0 * max(0, self._last_brain - brain)
+                # Civilian rescue: a family member vanishing WITH a score jump in
+                # the rescue-bonus band (1000-5000) is a pickup, not a Hulk/Brain
+                # kill (those score 0) — the dominant point source / 1-up engine.
+                if score_delta >= 900:
+                    reward += 75.0 * max(0, self._last_family - family)
 
         truncated = False
 
@@ -351,6 +347,7 @@ class MameRobotronEnv(gym.Env):
             info = {"score": score, "lives": lives, "wave": wave}
             self._last_score, self._last_lives, self._last_wave = score, lives, wave
             self._last_spawn, self._last_shoot, self._last_brain, self._last_family = spawn, shoot, brain, family
+        self._last_dead = dead   # track every step (incl. dead frames) for edge detection
 
         obs = self._obs_builder(packet).astype(np.float32)
         return obs, reward, terminated, truncated, info

@@ -308,6 +308,52 @@ wall-avoidance). Breaking it needs a representational/architectural change
 (spatial grid + CNN, or attention over entities, or recurrence) — a real build,
 not a knob. HELD for user decision; cheap experiments exhausted.
 
+Death-LOCATION analysis (C5, 19,938 deaths): 63% open field, 34% one-axis-edge,
+only 3% corner (LESS corner-clustered than uniform ~6%). The policy is NOT
+getting cornered against walls — it dies in the open to converging grunts.
+Reframes the representation argument: bottleneck is GLOBAL threat-field
+reasoning (where are all threats, which open region is safe), which the
+distance-ranked nearest-N slot obs obscures and a spatial grid+CNN would expose.
+Strengthens option 1 (CNN); weakens a pure-recurrence fix.
+
+## 2026-06-13 — CNN architecture did NOT break the wall (conclusive)
+
+Built spatial-grid obs (spatial_obs.py, 11x36x24) + GridCNN policy + obs_mode
+'grid' in train_mame.py (smoke-tested, committed). One 3M from-scratch run
+(cnn1, runs/f2g037u5, CPU ~240fps): continuous eval mean wave **2.4** — NOT
+better than MLP (2.6-3.2), slightly worse.
+
+THE WALL IS ROBUST TO EVERYTHING TRIED:
+- reward shaping (6 variants), warm-start vs from-scratch, velocity fix,
+- OBS REPRESENTATION (945-slot vs 11ch spatial grid),
+- POLICY ARCHITECTURE (MLP vs CNN).
+All continuous-from-wave-1 runs cap at mean wave ~3 (2.4-3.2). The bottleneck is
+NONE of these. Remaining untested invariants: frameskip 4, action space,
+2-life budget, PPO itself, or it's the honest model-free ceiling for this task.
+Death mode throughout: dies in OPEN field to slow grunts (decision quality, not
+control granularity or wall-cornering) → not obviously a frameskip issue either.
+
+Strategic juncture: the cheap + medium levers are exhausted. Real remaining
+options are big (different RL algorithm, 5-10x compute scaling, or accept the
+save-state specialist for deployment). HELD for user; GPU being set up to make
+any further scaling cheap.
+
+## 2026-06-13 — GPU enabled (user flagged the 4080)
+
+nvidia-smi shows the RTX 4080 fully in WSL2 (16GB, driver 610, CUDA UMD 13.3);
+only gap was a cpu-only torch (2.12.0+cpu). Installing torch==2.12.0+cu130
+(exact version, cu130 matches the 13.3 driver → no sb3/model compat change).
+Future runs: --device cuda (helps the compute-bound CNN ~2.5x; MLP stays
+env/MAME-bound at ~600fps).
+
+## 2026-06-13 — Long-budget scaling run on GPU (user-approved)
+
+Definitive test of "is wave-3 a sample/optimization limit or a true ceiling."
+Scaled BOTH model and data: GridCNN bumped to 32/64/128/128 conv + net_arch
+[512,256]; 15M steps (5x the standard link) on the 4080. cnnL, runs/pma8n1ge,
+fresh, pure wave-1, civilian+1up reward, ent 0.02. If continuous eval still
+caps at ~3 well before 15M, that's strong evidence of a true model-free ceiling
+for this task; if it climbs, wave-3 was a sample/optimization limit.
 PLATEAU: C1-C4 all wave ~3 despite civilian reward, mid-game bridge, death
 penalty, pure-wave-1, entropy. Common thread: policy dies at ~21k, just short
 of the 25k first bonus life — so the lives→depth flywheel never ignites. C5
@@ -633,3 +679,27 @@ The wave-5 ceiling is structural. Real options:
 
 - `train_native.py` — modified 2026-05-29 to add spawner/shooter kill bonuses (SPAWNER_SWS, SHOOTER_SWS, `_count_spawners_shooters`). Toggleable via removing the bonus block in step().
 - `models/vm9hy8gw/` — paused chain head, used as warmstart for all experiments.
+
+## 2026-06-13 — ROOT CAUSE OF THE WAVE-3 WALL FOUND (user's insight)
+
+User: "a RANDOM agent gets past wave 3; first real difficulty is ~wave 5." Tested
+it: random agent caps at mean wave 2.3 (max 3) — SAME wall as every trained
+agent (2.4-3.2). The wall is AGENT-INDEPENDENT => env/reward bug, not a ceiling.
+This invalidates the entire "model-free ceiling" conclusion; reward/obs/arch/15M
+scaling all failed because the reward was broken.
+
+Traced it: the env detected deaths from the `lives` counter decreasing, but the
+lives register reads spurious transient values for ~15 steps after EVERY wave
+entry (e.g. lives 1->2->1 entering wave 2, dead-flag 0 the whole time). So every
+wave advance fired a FALSE -20 death penalty (and post-C5 a false +250 1-up on
+the up-flick). The agent was punished for advancing waves -> learned not to.
+Real deaths also lagged: lives decrements ~26 steps after the $9848 dead-flag
+rises.
+
+FIX (commit pending): real death = `lives decremented AND dead-flag set` (clean
+conjunction — lives-flickers have dead-flag 0; dead-flag flickers have no life
+loss). No reward during death frames; -20 once per real death; dropped the
+lives-based 1-up bonus. Verified: 2 deaths/episode (=2 lives), zero false
+alive-frame penalties. NEXT: retrain with fixed reward — expect the wall to
+finally break. Also pending: per-major-checkpoint VIDEO recording (user wants to
+watch progress) + revisit lives count (only 2; arcade default is 3).
