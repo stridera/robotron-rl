@@ -43,7 +43,8 @@ class GridCNN(BaseFeaturesExtractor):
         self.cnn = nn.Sequential(
             nn.Conv2d(n_in, 32, 3, stride=1, padding=1), nn.ReLU(),
             nn.Conv2d(32, 64, 3, stride=2, padding=1), nn.ReLU(),   # 36x24 -> 18x12
-            nn.Conv2d(64, 64, 3, stride=2, padding=1), nn.ReLU(),   # -> 9x6
+            nn.Conv2d(64, 128, 3, stride=2, padding=1), nn.ReLU(),  # -> 9x6
+            nn.Conv2d(128, 128, 3, stride=1, padding=1), nn.ReLU(),
             nn.Flatten(),
         )
         with th.no_grad():
@@ -103,7 +104,7 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
          vec_normalize=None, lr=3e-4, clip_range=0.2, ent_coef=0.01,
          gamma=0.999, device="cpu", base_port=9800, frameskip=4,
          target_kl=None, reset_pool=None, auto_capture_min_wave=None,
-         obs_mode="slot"):
+         obs_mode="slot", norm_reward=False):
 
     fine_tuning = bc_checkpoint is not None
     run = wandb.init(project="robotron", group="ppo_mame_chain",
@@ -124,11 +125,11 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
     # Grid obs is already well-scaled (counts + clipped velocity); skip obs
     # normalization (per-element stats on a sparse grid amplify noise). Slot obs
     # keeps the running normalizer.
-    envs = VecNormalize(envs, norm_obs=(obs_mode != "grid"), norm_reward=False, clip_obs=10.)
+    envs = VecNormalize(envs, norm_obs=(obs_mode != "grid"), norm_reward=norm_reward, clip_obs=10.)
     if vec_normalize:
         envs = VecNormalize.load(vec_normalize, envs.venv)
         envs.training = True
-        envs.norm_reward = False
+        envs.norm_reward = norm_reward
 
     if fine_tuning:
         model = PPO.load(bc_checkpoint, env=envs, device=device)
@@ -145,7 +146,7 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
                     learning_rate=lr,
                     policy_kwargs={"features_extractor_class": GridCNN,
                                    "features_extractor_kwargs": {"features_dim": 512},
-                                   "net_arch": [256]},
+                                   "net_arch": [512, 256]},
                     target_kl=target_kl,
                     tensorboard_log=f"runs/{run.id}")
     else:
@@ -199,12 +200,13 @@ if __name__ == "__main__":
                    help="save a reset state whenever a training env enters a wave >= this (harvest into the next link's pool)")
     p.add_argument("--obs-mode", type=str, default="slot", choices=["slot", "grid"],
                    help="'slot'=945-dim MLP obs; 'grid'=(11,36,24) spatial CNN obs")
+    p.add_argument("--norm-reward", action="store_true", help="VecNormalize reward normalization (reduces return variance)")
     args = p.parse_args()
     pool = [int(x) for x in args.reset_pool.split(",")] if args.reset_pool else None
     main(num_envs=args.num_envs, total_timesteps=args.timesteps,
          bc_checkpoint=args.bc_checkpoint, vec_normalize=args.vec_normalize,
          lr=args.lr, clip_range=args.clip_range, ent_coef=args.ent_coef,
          gamma=args.gamma, device=args.device, base_port=args.base_port,
-         obs_mode=args.obs_mode,
+         obs_mode=args.obs_mode, norm_reward=args.norm_reward,
          frameskip=args.frameskip, target_kl=args.target_kl, reset_pool=pool,
          auto_capture_min_wave=args.auto_capture_min_wave)
