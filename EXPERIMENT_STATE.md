@@ -767,3 +767,25 @@ works!), spawner_kill +50, death -20. Videos in videos/.
 Also fixed: _count_strategic read the $98D4 font-memory garbage -> now uses the
 typed entity list; civilian rescue 75 -> 250 (user-directed). fixed4 (warm-start
 fixed3, ent 0.005, high civilian reward) launched to push civilian gathering.
+
+## 2026-06-14 — Entropy fix worked; fixed5 multi-change regressed; back to basics
+
+fixed1(ent 0.02): policy 92% random (entropy 3.81). fixed3(ent 0.005): entropy
+3.25, eval mean 2.5->2.9, policy commits — USER CONFIRMED purposeful play in the
+overlay video (moves+shoots at enemies, though shots off-center/miss and walks
+past civilians).
+
+fixed5(ent 0.002 + norm_reward + civilian 250, ALL AT ONCE): entropy 2.77,
+value_loss 8000->11 (mostly a normalization scale artifact), but eval REGRESSED
+to mean 1.9 with 7/25 wave-1 deaths — civilian reward 250 caused suicidal
+human-chasing into grunt clusters; lesson: change one variable at a time.
+
+fixed6: warm-start fixed3 (models/28v2tmxk), proven config (ent 0.005, NO
+norm_reward), civilian reward 75->150 only (moderate). OUTPUT_DIR models/z686auz7
+(run-id collision now logged to avoid evaling the wrong model — fixed5's real
+model was models/7g4cvw3e, not the shared 28v2tmxk = fixed3).
+
+Open behaviors (user, from video): shot alignment (off-center, shots miss ->
+candidate: on-axis aiming bonus), civilian collection (should improve with the
+reward + training). Path: the setup is finally correct end-to-end; chain
+proven-config links + tune civilian reward gently.
