@@ -68,14 +68,10 @@ _HARMLESS = {"Mom", "Dad", "Mikey", "PlayerIcon", "PlayerBullet"}
 
 
 def _entities_near(packet: bytes, px: int, py: int, radius: int):
-    """All slot entities within `radius` (game units, chebyshev) of (px,py)."""
+    """All entities within `radius` (game units, chebyshev) of (px,py), from the
+    CORRECT typed entity list (the old $98D4 'slot pool' overlapped font memory)."""
     out = []
-    for i in range(_SLOT_COUNT):
-        off = _SLOT_BASE + i * _SLOT_STRIDE
-        sw = (packet[off + 4] << 8) | packet[off + 5]
-        if sw == 0:
-            continue
-        ex, ey = packet[off], packet[off + 1]
+    for addr, lid, sw, ex, ey in iter_entities(packet):
         d = max(abs(ex - px), abs(ey - py))
         if d <= radius:
             out.append({"sw": f"0x{sw:04X}", "name": classify_sw(sw),
@@ -169,11 +165,9 @@ class MameRobotronEnv(gym.Env):
         at the death frame is flagged 'vanished' (prime suspect)."""
         if self._death_log is None or not self._pkt_history:
             return
-        # Live SWs at the death frame, keyed by slot index, to detect vanishing.
-        cur_slots = {}
-        for i in range(_SLOT_COUNT):
-            off = _SLOT_BASE + i * _SLOT_STRIDE
-            cur_slots[i] = (cur_pkt[off + 4] << 8) | cur_pkt[off + 5]
+        # Live SWs at the death frame (from the correct typed list), to detect
+        # which suspect vanished (mutual-destruction prime suspect).
+        live_sws_now = {sw for addr, lid, sw, x, y in iter_entities(cur_pkt)}
         # Suspects: entities near the player in ANY recent packet.
         suspects = {}
         for age, pkt in enumerate(reversed(self._pkt_history)):  # age 0 = latest pre-death
@@ -183,10 +177,9 @@ class MameRobotronEnv(gym.Env):
                 if key not in suspects or e["d"] < suspects[key]["d"]:
                     e2 = dict(e); e2["age"] = age
                     suspects[key] = e2
-        # Vanished flag: a suspect SW that no longer appears anywhere in the pool.
-        live_sws = set(cur_slots.values())
+        # Vanished flag: a suspect SW that no longer appears in the live list.
         for s in suspects.values():
-            s["vanished"] = int(s["sw"], 16) not in live_sws
+            s["vanished"] = int(s["sw"], 16) not in live_sws_now
         near = sorted(suspects.values(), key=lambda e: (e["d"], e["age"]))
         rec = {
             "wave": wave, "score": score, "terminal": terminal,
