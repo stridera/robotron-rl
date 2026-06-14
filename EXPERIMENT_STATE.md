@@ -703,3 +703,47 @@ lives-based 1-up bonus. Verified: 2 deaths/episode (=2 lives), zero false
 alive-frame penalties. NEXT: retrain with fixed reward — expect the wall to
 finally break. Also pending: per-major-checkpoint VIDEO recording (user wants to
 watch progress) + revisit lives count (only 2; arcade default is 3).
+
+## 2026-06-13 — Reward fix necessary but NOT sufficient; deeper diagnosis
+
+After the game_state reward fix, a fresh MLP run (28v2tmxk) mid-eval at 1.77M =
+mean wave 2.9 — still walled. Key: the reward bug only affected TRAINED agents,
+but a RANDOM agent also caps at mean 2.3 (user's insight), so the env is hard
+for ALL agents in the early waves — untouched by the reward fix.
+
+Diagnostics (note: the old death-forensics read the $98D4 "slot pool" which the
+ASM audit shows overlaps font-render memory $98D0-$98D2 — likely GARBAGE; the
+945-dim obs uses the validated typed-entity list-walk and is fine):
+- Killer (re-run with CORRECT typed-entity data, at the exact game_state==0x1B
+  death instant): GRUNTS at close range (8-14u) in the OPEN middle of the field.
+- DIR table in robotron_server.lua is CORRECT (dir6=down+left, dir7=left, etc.);
+  movement works. Earlier "broken directions" were wall/drift test artifacts.
+- Player vs grunt speed ratio: UNRESOLVED (clean test kept failing on port/CPU
+  contention with training). Xenia validation said 25 vs 2 u/s (12x), but a
+  noisy test suggested only ~2-4x. Re-test cleanly after training frees CPU.
+
+Open question: why do all agents die to slow grunts in the open early game?
+Hypotheses to test next: (a) player speed actually low (control/frameskip),
+(b) early game just needs more training on the CORRECTED reward (all prior
+training was on broken reward — chain several fixed-reward links), (c) 2 lives.
+TODO: audit/fix the $98D4 slot pool (kill-bonus + forensics read it).
+
+## 2026-06-13 — fixed-reward eval + clean speed test
+
+fixed1 (28v2tmxk, fresh MLP, corrected game_state reward, 3M): final eval mean
+wave 2.5 (training highest_wave hit 6, but modal play still dies wave 2-3).
+So the reward fix is CORRECT but did NOT improve the eval mean — trained STILL
+≈ random. The wall is an ENV property, not reward/training.
+
+Clean speed test (reset-based, mame_gym/diag_movement.py):
+  player up/down 4.0 u/step, left/right 2.0 u/step; grunt 0.75 u/step.
+  => player ~3-5x faster than grunts (enough to evade). The 2x vert/horiz is a
+  unit-scale artifact (x spans ~133 units, y ~199, over a 292x240 screen ->
+  uniform physical speed), NOT a movement bug. DIR mapping confirmed correct.
+
+So: movement works, player outpaces grunts, reward fixed — yet all agents die
+to grunts at wave 2-3. Env-bug candidates exhausted from memory traces.
+Recording gameplay videos (videos/) for the user to watch and spot the issue
+(their random-agent insight was the key unlock). Still-open: whether early game
+is genuinely this hard for model-free RL with 2 lives + frameskip-4, or a subtle
+issue a human will see in the video.
