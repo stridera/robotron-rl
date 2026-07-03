@@ -1,0 +1,197 @@
+{
+  "tag": "combteacher2",
+  "best_fit": 14.254366666666666,
+  "best_wave": 14.0,
+  "best_params": {
+    "BORDER_ADJUST": 14.2,
+    "ADJACENT": 48.4,
+    "ADJACENT_HULK": 64.6,
+    "CLOSE": 60.9,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 167.8,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 59.4,
+    "CLOSE_FIRE_PROJECTILE": 76.8,
+    "CLOSE_MOVE_PROJECTILE": 56.2,
+    "CLOSE_FIRE_CHASE_ENEMY": 168.5,
+    "CLOSE_MOVE_CHASE_ENEMY": 16.6,
+    "CLOSE_FIRE_ENEMY": 233.7,
+    "CLOSE_MOVE_ENEMY": 60.7,
+    "CLOSE_FIRE_HULK": 51.1,
+    "CLOSE_MOVE_HULK": 50.2,
+    "CLOSE_FIRE_OBSTACLE": 79.3,
+    "CLOSE_MOVE_OBSTACLE": 38.8,
+    "CLOSE_MOVE_COUNT_LIMIT": 5,
+    "CLOSE_FIRE_COUNT_LIMIT": 3,
+    "CLOSE_MOVE_CIVILIAN": 97.7,
+    "ADJACENT_QUARK": 90.8,
+    "HULK_DEFLECT_R": 99.1
+  },
+  "mean_params": {
+    "BORDER_ADJUST": 12.6,
+    "ADJACENT": 50.6,
+    "ADJACENT_HULK": 59.8,
+    "CLOSE": 59.7,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 156.7,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 53.1,
+    "CLOSE_FIRE_PROJECTILE": 94.7,
+    "CLOSE_MOVE_PROJECTILE": 56.7,
+    "CLOSE_FIRE_CHASE_ENEMY": 162.2,
+    "CLOSE_MOVE_CHASE_ENEMY": 33.5,
+    "CLOSE_FIRE_ENEMY": 240.5,
+    "CLOSE_MOVE_ENEMY": 53.4,
+    "CLOSE_FIRE_HULK": 40.5,
+    "CLOSE_MOVE_HULK": 53.5,
+    "CLOSE_FIRE_OBSTACLE": 78.7,
+    "CLOSE_MOVE_OBSTACLE": 45.4,
+    "CLOSE_MOVE_COUNT_LIMIT": 6,
+    "CLOSE_FIRE_COUNT_LIMIT": 3,
+    "CLOSE_MOVE_CIVILIAN": 86.2,
+    "ADJACENT_QUARK": 95.8,
+    "HULK_DEFLECT_R": 104.4
+  },
+  "defaults": {
+    "BORDER_ADJUST": 20,
+    "ADJACENT": 40,
+    "ADJACENT_HULK": 50,
+    "CLOSE": 75,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 150,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 50,
+    "CLOSE_FIRE_PROJECTILE": 150,
+    "CLOSE_MOVE_PROJECTILE": 100,
+    "CLOSE_FIRE_CHASE_ENEMY": 175,
+    "CLOSE_MOVE_CHASE_ENEMY": 50,
+    "CLOSE_FIRE_ENEMY": 75,
+    "CLOSE_MOVE_ENEMY": 50,
+    "CLOSE_FIRE_HULK": 50,
+    "CLOSE_MOVE_HULK": 50,
+    "CLOSE_FIRE_OBSTACLE": 40,
+    "CLOSE_MOVE_OBSTACLE": 40,
+    "CLOSE_MOVE_COUNT_LIMIT": 5,
+    "CLOSE_FIRE_COUNT_LIMIT": 3,
+    "CLOSE_MOVE_CIVILIAN": 75,
+    "ADJACENT_QUARK": 75,
+    "HULK_DEFLECT_R": 60
+  },
+  "history": [
+    {
+      "gen": 0,
+      "best_wave": 13.833333333333334,
+      "best_fit": 14.086,
+      "mean_wave_top": 10.92
+    },
+    {
+      "gen": 1,
+      "best_wave": 12.833333333333334,
+      "best_fit": 13.059,
+      "mean_wave_top": 11.3
+    },
+    {
+      "gen": 2,
+      "best_wave": 13.333333333333334,
+      "best_fit": 13.574,
+      "mean_wave_top": 12.15
+    },
+    {
+      "gen": 3,
+      "best_wave": 13.75,
+      "best_fit": 14.006,
+      "mean_wave_top": 12.71
+    },
+    {
+      "gen": 4,
+      "best_wave": 12.916666666666666,
+      "best_fit": 13.171,
+      "mean_wave_top": 12.46
+    },
+    {
+      "gen": 5,
+      "best_wave": 13.0,
+      "best_fit": 13.232,
+      "mean_wave_top": 12.51
+    },
+    {
+      "gen": 6,
+      "best_wave": 13.416666666666666,
+      "best_fit": 13.664,
+      "mean_wave_top": 12.71
+    },
+    {
+      "gen": 7,
+      "best_wave": 13.666666666666666,
+      "best_fit": 13.907,
+      "mean_wave_top": 13.01
+    },
+    {
+      "gen": 8,
+      "best_wave": 12.833333333333334,
+      "best_fit": 13.061,
+      "mean_wave_top": 12.55
+    },
+    {
+      "gen": 9,
+      "best_wave": 13.333333333333334,
+      "best_fit": 13.586,
+      "mean_wave_top": 12.69
+    },
+    {
+      "gen": 10,
+      "best_wave": 13.333333333333334,
+      "best_fit": 13.569,
+      "mean_wave_top": 12.5
+    },
+    {
+      "gen": 11,
+      "best_wave": 13.75,
+      "best_fit": 14.006,
+      "mean_wave_top": 12.89
+    },
+    {
+      "gen": 12,
+      "best_wave": 13.75,
+      "best_fit": 14.004,
+      "mean_wave_top": 12.85
+    },
+    {
+      "gen": 13,
+      "best_wave": 13.416666666666666,
+      "best_fit": 13.651,
+      "mean_wave_top": 12.64
+    },
+    {
+      "gen": 14,
+      "best_wave": 13.0,
+      "best_fit": 13.226,
+      "mean_wave_top": 12.41
+    },
+    {
+      "gen": 15,
+      "best_wave": 13.083333333333334,
+      "best_fit": 13.312,
+      "mean_wave_top": 12.68
+    },
+    {
+      "gen": 16,
+      "best_wave": 14.0,
+      "best_fit": 14.254,
+      "mean_wave_top": 12.94
+    },
+    {
+      "gen": 17,
+      "best_wave": 13.333333333333334,
+      "best_fit": 13.581,
+      "mean_wave_top": 13.18
+    },
+    {
+      "gen": 18,
+      "best_wave": 13.333333333333334,
+      "best_fit": 13.582,
+      "mean_wave_top": 12.71
+    },
+    {
+      "gen": 19,
+      "best_wave": 13.666666666666666,
+      "best_fit": 13.904,
+      "mean_wave_top": 12.84
+    }
+  ],
+  "gen_done": 20
+}

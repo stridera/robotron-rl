@@ -25,7 +25,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 from mame_obs import MameObsBuilder  # noqa: E402
 
 PIX_W, PIX_H = 665.0, 492.0
-GRID_W, GRID_H = 24, 36
+GRID_W, GRID_H = 48, 72   # finer grid (was 24x36): ~14x7px cells (~1 sprite each)
+                          # so the CNN can resolve individual enemy positions for
+                          # dodging — tests whether the 24x36 grid's underperformance
+                          # vs slot was a resolution limit. Fresh run required.
 
 # sprite name -> presence channel. Grouped by threat class.
 _CH = {

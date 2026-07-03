@@ -25,6 +25,7 @@ import torch.nn as nn
 import wandb
 from wandb.integration.sb3 import WandbCallback
 from stable_baselines3 import PPO
+from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
@@ -90,12 +91,15 @@ class VecNormSaver(BaseCallback):
 
 
 def make_env(rank: int, base_port: int, frameskip: int, reset_pool=None,
-             auto_capture_min_wave=None, obs_mode="slot"):
+             auto_capture_min_wave=None, obs_mode="slot", jsrl_h0=0):
     def _init():
         env = MameRobotronEnv(rank=rank, base_port=base_port, frameskip=frameskip,
                               reset_pool=reset_pool,
                               auto_capture_min_wave=auto_capture_min_wave,
                               obs_mode=obs_mode)
+        if jsrl_h0 > 0:   # JSRL: FSM guide drives the first (annealing) h steps each episode
+            from jumpstart_wrapper import JumpStartWrapper
+            env = JumpStartWrapper(env, h0=jsrl_h0)
         return Monitor(env, info_keywords=("score", "wave", "lives"))
     return _init
 
@@ -104,7 +108,7 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
          vec_normalize=None, lr=3e-4, clip_range=0.2, ent_coef=0.01,
          gamma=0.999, device="cpu", base_port=9800, frameskip=4,
          target_kl=None, reset_pool=None, auto_capture_min_wave=None,
-         obs_mode="slot", norm_reward=False):
+         obs_mode="slot", norm_reward=False, recurrent=False, jsrl_h0=0):
 
     fine_tuning = bc_checkpoint is not None
     run = wandb.init(project="robotron", group="ppo_mame_chain",
@@ -121,7 +125,7 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
     print("=" * 78, flush=True)
 
     envs = SubprocVecEnv([make_env(i, base_port, frameskip, reset_pool,
-                                   auto_capture_min_wave, obs_mode) for i in range(num_envs)])
+                                   auto_capture_min_wave, obs_mode, jsrl_h0) for i in range(num_envs)])
     # Grid obs is already well-scaled (counts + clipped velocity); skip obs
     # normalization (per-element stats on a sparse grid amplify noise). Slot obs
     # keeps the running normalizer.
@@ -147,6 +151,20 @@ def main(num_envs=8, total_timesteps=3_000_000, bc_checkpoint=None,
                     policy_kwargs={"features_extractor_class": GridCNN,
                                    "features_extractor_kwargs": {"features_dim": 512},
                                    "net_arch": [512, 256]},
+                    target_kl=target_kl,
+                    tensorboard_log=f"runs/{run.id}")
+    elif recurrent:
+        # Recurrent policy (LSTM) — fresh only; can't load MLP weights into an LSTM.
+        # An LSTM integrates enemy trajectories over time, targeting the "dies
+        # surrounded by converging grunts" failure a single-frame MLP can't reason
+        # about. n_steps=128 (shorter rollout per BPTT window, RecurrentPPO norm).
+        model = RecurrentPPO(policy="MlpLstmPolicy", env=envs, device=device, verbose=1,
+                    n_steps=128, batch_size=256, n_epochs=10,
+                    gamma=gamma, gae_lambda=0.95, clip_range=clip_range,
+                    ent_coef=ent_coef, vf_coef=0.5, max_grad_norm=0.5,
+                    learning_rate=lr,
+                    policy_kwargs={"net_arch": [256], "lstm_hidden_size": 256,
+                                   "n_lstm_layers": 1, "enable_critic_lstm": True},
                     target_kl=target_kl,
                     tensorboard_log=f"runs/{run.id}")
     else:
@@ -200,9 +218,12 @@ if __name__ == "__main__":
                    help="comma-separated state indices for episode starts, e.g. '0,0,1,2' (0=wave-1 boot, N=w5_N)")
     p.add_argument("--auto-capture-min-wave", type=int, default=None,
                    help="save a reset state whenever a training env enters a wave >= this (harvest into the next link's pool)")
-    p.add_argument("--obs-mode", type=str, default="slot", choices=["slot", "grid"],
-                   help="'slot'=945-dim MLP obs; 'grid'=(11,36,24) spatial CNN obs")
+    p.add_argument("--obs-mode", type=str, default="slot", choices=["slot", "grid", "hybrid"],
+                   help="'slot'=945-dim MLP obs; 'grid'=(11,72,48) spatial CNN obs; "
+                        "'hybrid'=945 slot + 12 global-threat features (957, MLP)")
     p.add_argument("--norm-reward", action="store_true", help="VecNormalize reward normalization (reduces return variance)")
+    p.add_argument("--recurrent", action="store_true", help="RecurrentPPO + MlpLstmPolicy (LSTM; fresh slot runs only)")
+    p.add_argument("--jsrl-h0", type=int, default=0, help="JSRL: initial FSM-guided prefix length (steps), annealed to 0. 0=off")
     args = p.parse_args()
     pool = [int(x) for x in args.reset_pool.split(",")] if args.reset_pool else None
     main(num_envs=args.num_envs, total_timesteps=args.timesteps,
@@ -210,5 +231,6 @@ if __name__ == "__main__":
          lr=args.lr, clip_range=args.clip_range, ent_coef=args.ent_coef,
          gamma=args.gamma, device=args.device, base_port=args.base_port,
          obs_mode=args.obs_mode, norm_reward=args.norm_reward,
+         recurrent=args.recurrent, jsrl_h0=args.jsrl_h0,
          frameskip=args.frameskip, target_kl=args.target_kl, reset_pool=pool,
          auto_capture_min_wave=args.auto_capture_min_wave)

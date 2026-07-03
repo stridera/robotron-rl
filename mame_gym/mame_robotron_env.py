@@ -15,6 +15,7 @@ kill range), 'explained-unmapped' (unmapped SW in kill range = missing sprite),
 """
 from __future__ import annotations
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -34,8 +35,55 @@ from mame_obs import classify_sw, iter_entities
 
 _SPAWNER_NAMES = ("Spheroid", "Quark")
 _SHOOTER_NAMES = ("Enforcer", "Tank")
-_BRAIN_NAMES   = ("Brain", "Brain (alt)")
+_BRAIN_NAMES   = ("Brain",)   # $2119 is a cruise missile, not a brain (fixed 2026-07-01)
 _FAMILY_LIST_ID = 2   # the game's family linked list ($981F); any member = a human
+
+_AIM_RADIUS = 70      # only reward aiming at threats within this chebyshev range
+_AIM_BONUS  = 0.5     # per-step reward when fire points at the nearest threat
+
+# Evasion shaping (fixed9): a TIGHT imminent-contact penalty, not a crowding
+# penalty. _DANGER_RADIUS sits just above _KILL_RADIUS (15) so it only fires when
+# a threat is one step from contact — teaches last-moment dodging. A WIDE radius
+# would punish being in crowded deep waves (the marathon goal), perversely
+# steering the policy AWAY from depth, so keep it tight.
+_DANGER_RADIUS = 20
+_PROX_PENALTY  = 1.5  # max per-step penalty at contact, fading linearly to 0 at edge
+
+# fixed12 tried an ENCIRCLEMENT penalty (penalize threats on 3+ compass sides),
+# motivated by forensics showing deaths happen while surrounded. It REGRESSED
+# (mean 3.2 -> 2.9, wave-2 deaths 2 -> 8): in dense waves you're always somewhat
+# surrounded, so the penalty taught the agent to freeze/flee instead of moving
+# through gaps. Reverted. The real surrounded-death fix is better MOTION, which a
+# state penalty can't express; left to a future motion-shaping or obs change.
+
+
+def _compass_dir(dx: int, dy: int) -> int:
+    """Game fire direction (1..8) pointing from the player toward (dx,dy).
+    dx>0 = threat to the right, dy>0 = threat below (screen y-down). Game dirs:
+    1=N 2=NE 3=E 4=SE 5=S 6=SW 7=W 8=NW. Verified against all 8 octants."""
+    ang = math.atan2(dy, dx)               # 0=E, +pi/2=S(down), pi=W, -pi/2=N(up)
+    sect = int(round(ang / (math.pi / 4))) % 8
+    return (3, 4, 5, 6, 7, 8, 1, 2)[sect]
+
+
+def _threat_field(packet: bytes, px: int, py: int):
+    """(nearest_any_dist, nearest_shootable_dist, nearest_shootable_dir). Threats =
+    non-family entities. 'shootable' EXCLUDES Hulks (fixed13): hulks are
+    indestructible, so rewarding aim at them is wasted and lures the agent toward
+    contact (forensics: hulks = 22% of deaths). The contact penalty uses
+    nearest_any (hulks must still be dodged)."""
+    any_d = None
+    sh_d, sh_dir = None, None
+    for addr, lid, sw, ex, ey in iter_entities(packet):
+        if lid == _FAMILY_LIST_ID:
+            continue
+        dx, dy = ex - px, ey - py
+        d = max(abs(dx), abs(dy))
+        if any_d is None or d < any_d:
+            any_d = d
+        if classify_sw(sw) != "Hulk" and (sh_d is None or d < sh_d):
+            sh_d, sh_dir = d, _compass_dir(dx, dy)
+    return any_d, sh_d, sh_dir
 
 
 def _count_strategic(packet: bytes):
@@ -62,7 +110,7 @@ _CLOSING_RADIUS = 28   # reachable within one frameskip-4 step of mutual approac
 _CONTEXT_RADIUS = 40   # log range (enforcer sparks cross ~16u/step)
 # Note: Progs alias to "Hulk" ($00B6) / "Cruise Missile" ($1F1F) — covered.
 _LETHAL = {"Grunt", "Electrode", "Hulk", "Sphereoid", "Quark", "Brain",
-           "Brain (alt)", "Enforcer", "Tank", "Cruise Missile",
+           "Prog", "Enforcer", "Tank", "TankShell", "Cruise Missile",
            "EnfBullet/Spark"}
 _HARMLESS = {"Mom", "Dad", "Mikey", "PlayerIcon", "PlayerBullet"}
 
@@ -124,6 +172,9 @@ class MameRobotronEnv(gym.Env):
             from spatial_obs import SpatialGridObsBuilder, NUM_CHANNELS, GRID_H, GRID_W
             self.observation_space = Box(low=-np.inf, high=np.inf,
                                          shape=(NUM_CHANNELS, GRID_H, GRID_W), dtype=np.float32)
+        elif obs_mode == "hybrid":
+            from hybrid_obs import HYBRID_DIM
+            self.observation_space = Box(low=-np.inf, high=np.inf, shape=(HYBRID_DIM,), dtype=np.float32)
         else:
             self.observation_space = Box(low=-np.inf, high=np.inf, shape=(945,), dtype=np.float32)
         self._port = base_port + rank
@@ -137,6 +188,9 @@ class MameRobotronEnv(gym.Env):
         if obs_mode == "grid":
             from spatial_obs import SpatialGridObsBuilder
             self._obs_builder = SpatialGridObsBuilder()
+        elif obs_mode == "hybrid":
+            from hybrid_obs import HybridObsBuilder
+            self._obs_builder = HybridObsBuilder()
         else:
             self._obs_builder = MameObsBuilder()
         self._bridge: MameBridge | None = None
@@ -146,10 +200,14 @@ class MameRobotronEnv(gym.Env):
         self._last_spawn = self._last_shoot = self._last_brain = self._last_family = 0
         self._last_gs = 0   # game_state ($9859) prev step, for death-edge detection
         self._last_packet: bytes | None = None   # raw obs packet (diagnostics)
-        # Short packet history for death forensics. Mutual-destruction kills
-        # (player walks into a grunt: BOTH die) remove the killer from the
-        # slot pool at the death frame — so the killer is only visible in
-        # the frames BEFORE death. Keep the last 3 packets (12 frames).
+        # Packet history for death forensics. Mutual-destruction kills (player
+        # walks into a grunt: BOTH die) remove the killer from the slot pool at
+        # the death frame — so the killer is only visible in the frames BEFORE
+        # death. MAME save-state is lossy (no reliable rewind), so this circular
+        # queue IS our rewind: it lets us reconstruct the pre-death trajectory
+        # (killer approach, player path, escape routes). Default 3 (cheap);
+        # set MAME_PKT_HISTORY (e.g. 40 ≈ 2.5s) for death-driven FSM analysis.
+        self._pkt_history_len = int(os.environ.get("MAME_PKT_HISTORY", "3"))
         self._pkt_history: list[bytes] = []
         # Death forensics log (JSONL per env rank); enabled via env var.
         log_dir = os.environ.get("MAME_DEATH_LOG_DIR", "")
@@ -278,7 +336,7 @@ class MameRobotronEnv(gym.Env):
 
         # Maintain pre-death history AFTER forensics (3 most recent packets).
         self._pkt_history.append(packet)
-        if len(self._pkt_history) > 3:
+        if len(self._pkt_history) > self._pkt_history_len:
             self._pkt_history.pop(0)
         self._last_packet = packet
 
@@ -299,6 +357,24 @@ class MameRobotronEnv(gym.Env):
             reward = score_delta / 10.0
             if score_delta: parts["score"] = round(score_delta / 10.0, 1)
             surv = 0.3 * max(1, int(wave)); reward += surv; parts["survive"] = round(surv, 1)
+            # Aiming reward (single-variable experiment, fixed7): a dense bonus
+            # for pointing fire at the nearest in-range threat. The agent fires
+            # every step (no no-fire action), so the lever is DIRECTION, not
+            # whether to shoot. fixed3/fixed6 plateaued ~2.7-2.9 with fire often
+            # off-axis (user-observed "stays just off-center, all shots miss");
+            # this rewards on-axis fire so shots actually connect.
+            any_d, sh_d, sh_dir = _threat_field(packet, h["player_x"], h["player_y"])
+            # Aim at the nearest SHOOTABLE threat (hulks excluded, fixed13).
+            if sh_dir is not None and sh_d <= _AIM_RADIUS and fire == sh_dir:
+                reward += _AIM_BONUS; parts["aim"] = _AIM_BONUS
+            # Evasion: graduated imminent-contact penalty (fixed9) on the nearest
+            # ANY threat (hulks INCLUDED — must still be dodged). Sharp gradient
+            # right where deaths happen, steering the policy to dodge at the last
+            # step. fixed7/fixed8 plateaued at depth 3.0 -> dense-wave survival,
+            # not aim, is the gate.
+            if any_d is not None and any_d < _DANGER_RADIUS:
+                prox = -_PROX_PENALTY * (1.0 - any_d / _DANGER_RADIUS)
+                reward += prox; parts["danger"] = round(prox, 2)
             if score_delta > 0:
                 sp = 50.0 * max(0, self._last_spawn - spawn)
                 sh = 20.0 * max(0, self._last_shoot - shoot)

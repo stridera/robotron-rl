@@ -13,6 +13,8 @@ import statistics
 from collections import Counter
 from pathlib import Path
 
+import numpy as np
+
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -26,6 +28,9 @@ N = int(sys.argv[3]) if len(sys.argv) > 3 else 15
 PORT = int(sys.argv[4]) if len(sys.argv) > 4 else 9970
 DETERMINISTIC = len(sys.argv) > 5 and sys.argv[5] == "det"
 OBS_MODE = sys.argv[6] if len(sys.argv) > 6 else "slot"
+# "rnn" anywhere in the trailing args => recurrent (LSTM) policy: load with
+# RecurrentPPO and thread the hidden state across steps, resetting it per episode.
+RECURRENT = "rnn" in sys.argv[5:]
 
 
 def main():
@@ -34,7 +39,11 @@ def main():
     venv = VecNormalize.load(VECNORM, venv)
     venv.training = False
     venv.norm_reward = False
-    model = PPO.load(MODEL, env=venv, device="cpu")
+    if RECURRENT:
+        from sb3_contrib import RecurrentPPO
+        model = RecurrentPPO.load(MODEL, env=venv, device="cpu")
+    else:
+        model = PPO.load(MODEL, env=venv, device="cpu")
 
     results = []
     for ep in range(N):
@@ -44,9 +53,17 @@ def main():
         max_wave = start_wave
         final_score = env._last_score
         steps = 0
+        lstm_states = None                          # reset hidden state each episode
+        episode_starts = np.ones((1,), dtype=bool)  # mark step 0 as an episode start
         while True:
-            a, _ = model.predict(obs, deterministic=DETERMINISTIC)
+            if RECURRENT:
+                a, lstm_states = model.predict(obs, state=lstm_states,
+                                               episode_start=episode_starts,
+                                               deterministic=DETERMINISTIC)
+            else:
+                a, _ = model.predict(obs, deterministic=DETERMINISTIC)
             obs, _, dones, infos = venv.step(a)
+            episode_starts = dones   # next step starts a new episode iff this one ended
             info = infos[0]
             max_wave = max(max_wave, info.get("wave", 0))
             if not dones[0]:

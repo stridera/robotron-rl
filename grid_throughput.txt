@@ -1,0 +1,1 @@
+THROUGHPUT: first checkpoint ppo_mame_checkpoint_100000_steps.zip after 220s -> ~454 fps aggregate

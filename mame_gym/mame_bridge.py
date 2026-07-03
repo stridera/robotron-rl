@@ -24,11 +24,19 @@ LUA_SCRIPT = str(Path(__file__).parent / "robotron_server.lua")
 STATE_DIR = os.environ.get("MAME_STATE_DIR",
                            str(Path.home() / "Code" / "robotron-rl" / "mame_states"))
 
-HDR_LEN = 10
+HDR_LEN = 11   # byte10 = score millions ($BDE4) appended 2026-07-01 (score is 4 BCD bytes)
 SLOT_BASE = 0x98D4
 SLOT_BYTES = 101 * 24
 FIXED_LEN = HDR_LEN + SLOT_BYTES + 1   # header + pool + n_entities byte
 ENTITY_REC = 7                          # [addr_hi, addr_lo, list_id, sw_hi, sw_lo, x, y]
+
+EMIT_ANIM = os.environ.get("MAME_EMIT_ANIM") == "1"  # server appends n*2 anim-ptr bytes
+# Exact-forward-model state blocks (Stage 3, MAME_EMIT_SIM=1): per entity n*8
+# dynamics bytes ($0A-$11 pos/vel 8.8) + n*2 timer bytes ($12/$13), then 27
+# global bytes ($BE5C-67 difficulty, $9884-86 RNG, $BE68-71 counts, $98F0/F1
+# spark/shell live counters). See robotron_server.lua walk_lists.
+EMIT_SIM = os.environ.get("MAME_EMIT_SIM") == "1"
+SIM_GLOBALS_LEN = 27
 
 CMD_STEP, CMD_RESET, CMD_QUIT, CMD_SAVE, CMD_SNAP = 0, 1, 2, 3, 4
 
@@ -50,11 +58,15 @@ class MameBridge:
         log_path = os.environ.get("MAME_LOG", "")
         out = open(log_path, "w") if log_path else subprocess.DEVNULL
         # Headless, uncapped. cwd at rompath parent so MAME finds cfg/nvram.
+        cmd = [MAME_BIN, "-rompath", ROMPATH, "robotron",
+               "-video", "none", "-sound", "none", "-nothrottle",
+               "-autoboot_script", LUA_SCRIPT,
+               "-state_directory", STATE_DIR]
+        snap_dir = os.environ.get("MAME_SNAP_DIR")
+        if snap_dir:  # per-run screenshot dir (YOLO dataset collection)
+            cmd += ["-snapshot_directory", snap_dir]
         self._proc = subprocess.Popen(
-            [MAME_BIN, "-rompath", ROMPATH, "robotron",
-             "-video", "none", "-sound", "none", "-nothrottle",
-             "-autoboot_script", LUA_SCRIPT,
-             "-state_directory", STATE_DIR],
+            cmd,
             cwd=str(Path(ROMPATH).parent),
             env=env, stdout=out, stderr=out,
         )
@@ -93,7 +105,12 @@ class MameBridge:
         fixed = self._recv_exact(FIXED_LEN)
         n = fixed[-1]
         tail = self._recv_exact(n * ENTITY_REC) if n else b""
-        return fixed + tail
+        # When MAME_EMIT_ANIM=1 the server appends an n*2-byte anim-ptr block
+        # (node+2/+3) after the entity records; consume it so the stream stays
+        # in sync. Kept in the returned packet for validation tooling.
+        anim = self._recv_exact(n * 2) if (EMIT_ANIM and n) else b""
+        sim = self._recv_exact(n * 10 + SIM_GLOBALS_LEN) if EMIT_SIM else b""
+        return fixed + tail + anim + sim
 
     def step(self, move_dir: int, fire_dir: int):
         """Apply action, advance frameskip frames, return raw obs bytes.
@@ -171,10 +188,12 @@ class MameBridge:
 
 
 def parse_obs_header(obs: bytes) -> dict:
-    # byte 8 = current_player ($983F), byte 9 = game_state ($9859). See
+    # byte 8 = current_player ($983F), byte 9 = game_state ($9859), byte 10 =
+    # score millions ($BDE4 — p1_score is 4 BCD bytes $BDE4-7). See
     # mame_obs.parse_header (authoritative); kept here for standalone use.
-    wave, lives, s5, s6, s7, px, pxsub, py, cur_player, game_state = obs[:HDR_LEN]
-    score = ((s5 >> 4) * 10 + (s5 & 0xF)) * 10000 + \
+    wave, lives, s5, s6, s7, px, pxsub, py, cur_player, game_state, s4 = obs[:HDR_LEN]
+    score = ((s4 >> 4) * 10 + (s4 & 0xF)) * 1000000 + \
+            ((s5 >> 4) * 10 + (s5 & 0xF)) * 10000 + \
             ((s6 >> 4) * 10 + (s6 & 0xF)) * 100 + \
             ((s7 >> 4) * 10 + (s7 & 0xF))
     return {"wave": wave, "lives": lives, "score": score,

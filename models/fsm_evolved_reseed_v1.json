@@ -1,0 +1,146 @@
+{
+  "tag": "reseed_v1",
+  "best_fit": 13.9159375,
+  "best_wave": 13.666666666666666,
+  "best_params": {
+    "BORDER_ADJUST": 20.2,
+    "ADJACENT": 49.6,
+    "ADJACENT_HULK": 54.4,
+    "CLOSE": 35.9,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 150.9,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 84.8,
+    "CLOSE_FIRE_PROJECTILE": 131.0,
+    "CLOSE_MOVE_PROJECTILE": 84.6,
+    "CLOSE_FIRE_CHASE_ENEMY": 150.7,
+    "CLOSE_MOVE_CHASE_ENEMY": 56.7,
+    "CLOSE_FIRE_ENEMY": 127.0,
+    "CLOSE_MOVE_ENEMY": 51.0,
+    "CLOSE_FIRE_HULK": 40.5,
+    "CLOSE_MOVE_HULK": 79.6,
+    "CLOSE_FIRE_OBSTACLE": 49.5,
+    "CLOSE_MOVE_OBSTACLE": 25.6,
+    "CLOSE_MOVE_COUNT_LIMIT": 6,
+    "CLOSE_FIRE_COUNT_LIMIT": 5,
+    "CLOSE_MOVE_CIVILIAN": 66.9
+  },
+  "defaults": {
+    "BORDER_ADJUST": 20,
+    "ADJACENT": 40,
+    "ADJACENT_HULK": 50,
+    "CLOSE": 75,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 150,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 50,
+    "CLOSE_FIRE_PROJECTILE": 150,
+    "CLOSE_MOVE_PROJECTILE": 100,
+    "CLOSE_FIRE_CHASE_ENEMY": 175,
+    "CLOSE_MOVE_CHASE_ENEMY": 50,
+    "CLOSE_FIRE_ENEMY": 75,
+    "CLOSE_MOVE_ENEMY": 50,
+    "CLOSE_FIRE_HULK": 50,
+    "CLOSE_MOVE_HULK": 50,
+    "CLOSE_FIRE_OBSTACLE": 40,
+    "CLOSE_MOVE_OBSTACLE": 40,
+    "CLOSE_MOVE_COUNT_LIMIT": 5,
+    "CLOSE_FIRE_COUNT_LIMIT": 3,
+    "CLOSE_MOVE_CIVILIAN": 75
+  },
+  "history": [
+    {
+      "gen": 0,
+      "best_wave": 10.166666666666666,
+      "best_fit": 10.354,
+      "mean_wave_top": 9.38
+    },
+    {
+      "gen": 1,
+      "best_wave": 11.666666666666666,
+      "best_fit": 11.881,
+      "mean_wave_top": 10.12
+    },
+    {
+      "gen": 2,
+      "best_wave": 11.333333333333334,
+      "best_fit": 11.543,
+      "mean_wave_top": 10.5
+    },
+    {
+      "gen": 3,
+      "best_wave": 13.166666666666666,
+      "best_fit": 13.407,
+      "mean_wave_top": 11.06
+    },
+    {
+      "gen": 4,
+      "best_wave": 11.833333333333334,
+      "best_fit": 12.05,
+      "mean_wave_top": 10.94
+    },
+    {
+      "gen": 5,
+      "best_wave": 12.0,
+      "best_fit": 12.187,
+      "mean_wave_top": 11.12
+    },
+    {
+      "gen": 6,
+      "best_wave": 11.833333333333334,
+      "best_fit": 12.049,
+      "mean_wave_top": 11.02
+    },
+    {
+      "gen": 7,
+      "best_wave": 11.833333333333334,
+      "best_fit": 12.05,
+      "mean_wave_top": 11.5
+    },
+    {
+      "gen": 8,
+      "best_wave": 13.166666666666666,
+      "best_fit": 13.415,
+      "mean_wave_top": 12.17
+    },
+    {
+      "gen": 9,
+      "best_wave": 13.0,
+      "best_fit": 13.24,
+      "mean_wave_top": 11.6
+    },
+    {
+      "gen": 10,
+      "best_wave": 13.5,
+      "best_fit": 13.748,
+      "mean_wave_top": 12.44
+    },
+    {
+      "gen": 11,
+      "best_wave": 13.0,
+      "best_fit": 13.229,
+      "mean_wave_top": 12.27
+    },
+    {
+      "gen": 12,
+      "best_wave": 13.5,
+      "best_fit": 13.744,
+      "mean_wave_top": 12.27
+    },
+    {
+      "gen": 13,
+      "best_wave": 13.0,
+      "best_fit": 13.252,
+      "mean_wave_top": 12.12
+    },
+    {
+      "gen": 14,
+      "best_wave": 13.166666666666666,
+      "best_fit": 13.412,
+      "mean_wave_top": 12.12
+    },
+    {
+      "gen": 15,
+      "best_wave": 13.666666666666666,
+      "best_fit": 13.916,
+      "mean_wave_top": 12.4
+    }
+  ],
+  "gen_done": 16
+}

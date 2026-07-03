@@ -16,6 +16,18 @@
 
 local PORT = os.getenv("MAME_RL_PORT") or "8123"
 local FRAMESKIP_DEFAULT = 4
+-- Optional RNG reseed (opt-in MAME_RL_RESEED=1). Robotron's RNG state is the
+-- 3-byte LFSR at $9884-$9886 (robomame.asm $D6CD: "$84, DP=$98 -> $9884"). The
+-- boot presses start at a fixed frame, freezing it in rl_reset -> identical games.
+-- Poke a fresh per-reset value (decorrelated per instance by PORT) so enemy RNG
+-- diverges -> varied games at save-state speed. OFF by default.
+local RESEED = (os.getenv("MAME_RL_RESEED") == "1")
+-- Seed base: port-derived by default (each port = its own game sequence). Set
+-- MAME_RL_SEED_BASE to a fixed value so SEPARATE runs (e.g. an A/B on different
+-- ports) face the IDENTICAL game sequence -> true PAIRED comparison (much lower
+-- variance than the per-port-random sequences). Added 2026-06-29.
+local rng_seed = tonumber(os.getenv("MAME_RL_SEED_BASE")) or ((tonumber(PORT) or 8123) * 2749 + 1)
+local pending_reseed = false
 
 local sock, opened = nil, false
 local mem, F = nil, {}
@@ -75,10 +87,30 @@ end
 --   Dead objects unlink ⇒ the walk yields only LIVE entities by construction.
 local SLOT_BASE, SLOT_BYTES = 0x98D4, 101 * 24
 local LIST_HEADS = { [1] = 0x9817, [2] = 0x981F, [3] = 0x9821, [4] = 0x9823 }
-local MAX_ENTITIES = 120
+-- Cap must exceed the object pool size (180 records, ENEMY_MODEL.md §1) so a
+-- flooded list 1 (20 shells + 20 sparks + 8 enforcers + tanks/quarks) can never
+-- starve later lists (family/electrodes) out of the shared-counter walk.
+-- Wire format is a single n byte, so anything ≤255 is protocol-safe.
+local MAX_ENTITIES = 190
+-- Validation only: also emit each entity's animation-frame pointer (node+2/+3,
+-- the actual sprite bitmap the hardware blits). This is an identity source
+-- INDEPENDENT of the +8/9 collision-handler SW the decoder types on, so it can
+-- catch SW-table mislabels (e.g. tank shells labeled Quark). Appended as a
+-- separate trailing block (n*2 bytes, same walk order) so the 7-byte record
+-- layout above is byte-identical for all normal consumers.
+local EMIT_ANIM = os.getenv("MAME_EMIT_ANIM") == "1"
+-- Exact-forward-model state (Stage 3): per-entity dynamics fields + game-global
+-- sim variables, appended as trailing blocks (base layout untouched):
+--   per entity (n*8 bytes, walk order): $0A/$0B X whole.frac, $0C/$0D Y whole.frac,
+--     $0E/$0F X-velocity 8.8, $10/$11 Y-velocity 8.8
+--   per entity (n*2 bytes): $12/$13 AI/move countdown fields
+--   globals (27 bytes): $BE5C..$BE67 (12 difficulty vars), $9884-$9886 (RNG),
+--     $BE68..$BE71 (10 live-enemy counts: grunts,..., quarks, tanks),
+--     $98F0/$98F1 (spark / tank-shell live counters — the $F1 budget exploit)
+local EMIT_SIM = os.getenv("MAME_EMIT_SIM") == "1"
 
 local function walk_lists()
-    local recs, n = {}, 0
+    local recs, anims, sims, timers, n = {}, {}, {}, {}, 0
     for list_id = 1, 4 do
         local node = mem:read_u8(LIST_HEADS[list_id]) * 256
                    + mem:read_u8(LIST_HEADS[list_id] + 1)
@@ -90,10 +122,32 @@ local function walk_lists()
                 math.floor(node / 256) % 256, node % 256, list_id,
                 mem:read_u8(node + 8), mem:read_u8(node + 9),
                 mem:read_u8(node + 4), mem:read_u8(node + 5))
+            if EMIT_ANIM then
+                anims[n] = string.char(mem:read_u8(node + 2), mem:read_u8(node + 3))
+            end
+            if EMIT_SIM then
+                sims[n] = string.char(
+                    mem:read_u8(node + 0x0A), mem:read_u8(node + 0x0B),
+                    mem:read_u8(node + 0x0C), mem:read_u8(node + 0x0D),
+                    mem:read_u8(node + 0x0E), mem:read_u8(node + 0x0F),
+                    mem:read_u8(node + 0x10), mem:read_u8(node + 0x11))
+                timers[n] = string.char(mem:read_u8(node + 0x12), mem:read_u8(node + 0x13))
+            end
             node = mem:read_u8(node) * 256 + mem:read_u8(node + 1)
         end
     end
-    return string.char(n) .. table.concat(recs)
+    local out = string.char(n) .. table.concat(recs)
+    if EMIT_ANIM then out = out .. table.concat(anims) end
+    if EMIT_SIM then
+        out = out .. table.concat(sims) .. table.concat(timers)
+        local g = {}
+        for a = 0xBE5C, 0xBE67 do g[#g + 1] = string.char(mem:read_u8(a)) end
+        for a = 0x9884, 0x9886 do g[#g + 1] = string.char(mem:read_u8(a)) end
+        for a = 0xBE68, 0xBE71 do g[#g + 1] = string.char(mem:read_u8(a)) end
+        g[#g + 1] = string.char(mem:read_u8(0x98F0), mem:read_u8(0x98F1))
+        out = out .. table.concat(g)
+    end
+    return out
 end
 
 local function pack_obs()
@@ -101,7 +155,10 @@ local function pack_obs()
         mem:read_u8(0xBDED), mem:read_u8(0xBDEC),
         mem:read_u8(0xBDE5), mem:read_u8(0xBDE6), mem:read_u8(0xBDE7),
         mem:read_u8(0x9864), mem:read_u8(0x9865), mem:read_u8(0x9866),
-        mem:read_u8(0x983F), mem:read_u8(0x9859))   -- byte9 = game_state ($9859); $1B=KILL_PLAYER, $FF=game over
+        mem:read_u8(0x983F), mem:read_u8(0x9859),  -- byte9 = game_state ($9859); $1B=KILL_PLAYER, $FF=game over
+        mem:read_u8(0xBDE4))  -- byte10 = score MILLIONS byte (p1_score is 4 BCD bytes
+                              -- $BDE4-7, asm:131; without it scores wrap at 1M —
+                              -- caught 2026-07-01 by a wave-48 game reading 408k)
     local bytes = {}
     for i = 0, SLOT_BYTES - 1 do bytes[i + 1] = string.char(mem:read_u8(SLOT_BASE + i)) end
     return hdr .. table.concat(bytes) .. walk_lists()
@@ -134,6 +191,7 @@ local function read_and_dispatch()
         else
             manager.machine:load(RESET_STATE)
         end
+        pending_reseed = RESEED and (idx == 0)   -- poke AFTER load settles (load is async)
         state = "loading"; settle = 3
     elseif c == CMD_SAVE then
         manager.machine:save("w5_" .. (b2 * 256 + b3))
@@ -185,7 +243,17 @@ emu.register_frame_done(function()
         return
     elseif state == "loading" then
         settle = settle - 1
-        if settle <= 0 then checkpoint() end  -- send loaded-state obs, read next
+        if settle <= 0 then
+            if pending_reseed then
+                -- load has fully applied now; poke the RNG state ($9884-$9886)
+                rng_seed = (rng_seed * 1103515245 + 12345) % 2147483648
+                mem:write_u8(0x9884, math.floor(rng_seed / 8388608) % 256)
+                mem:write_u8(0x9885, math.floor(rng_seed / 32768) % 256)
+                mem:write_u8(0x9886, math.floor(rng_seed / 128) % 256)
+                pending_reseed = false
+            end
+            checkpoint()  -- send loaded-state obs, read next
+        end
         return
     end
     -- state == "run": count down this step's frames, then reply + read next.
