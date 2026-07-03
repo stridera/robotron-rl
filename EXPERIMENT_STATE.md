@@ -3168,3 +3168,25 @@ REMAINING (deployment phase, per project_goal_xbox_yolo): Xenia YOLO dataset -> 
 loop -> latency compensation -> real Xbox hardware. Optional strength: another evolution
 round (fitness gradient was still live at gen 8), Stage-3 exact-model search to push
 P(>=100) higher.
+
+## 2026-07-02 - Milestone committed (82bb3f1) + Xenia YOLO phase started
+Committed the wave-100 milestone work (88 files; ROM/asm/save-states excluded per copyright).
+XENIA PHASE (deployment, per project_goal_xbox_yolo) — recon + first drop into
+~/win/code/robotron (the Windows Xenia toolkit; not a git repo):
+- RECON: mature stack already exists — XeniaMemory (JIT-hook shared buffer),
+  GameStateReader (30Hz entity reads), player.py vgamepad server (0.3s neutral timeout),
+  screen_capture (PrintWindow), auto_labeler.py (synchronized PNG+JSON -> YOLO export,
+  calibrated render-layer transform), reviewer.py (newest bounds calibration). Hard dep:
+  custom xenia-canary build with C++ JIT hooks. Best prior brain reached wave 7.
+- FOUND & FIXED: the Xenia label tables had the SAME pre-2026-07-01 bugs as MAME (phantom
+  0x4800 tank, 0x4DF2-as-shell, 0x1F1F-as-missile, 0x4FEE shell anim in the quark set,
+  cruise anim swallowed by the prog range, obsolete TS-near-Q dedup deleting real shells).
+  Corrected per ENEMY_MODEL.md §2 in jit_entity_reader.py + game_state.py. CAVEAT: the C++
+  hook (x64_sequences.cc kQuarkCmds) needs the same split + rebuild for the entity_list path.
+- PORTED: brain_champion.py = the wave-142 champion on Xenia (GameStateReader -> 665x492
+  pixel transform (identical to mame_obs) -> robotron_fsm+clearance_planner at 15Hz ->
+  player.py sticks; per-tick nearest-match velocity tracker for the planner). Support files
+  copied: robotron_fsm.py, clearance_planner.py, fsm_evolved_planner_v2_final.json.
+- HANDOFF: ~/win/code/robotron/XENIA_CHAMPION_HANDOFF.md (run order, label verification
+  checklist at waves 5/7+, calibration notes, open items). Windows-side execution (custom
+  Xenia build + player.py + brain + auto_labeler) requires the user's Windows session.
