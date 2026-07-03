@@ -60,6 +60,12 @@ PARAMS = [
     # apply_params setattrs these on the fsm module; HULK_DEFLECT (bool) stays default-ON, not evolved.
     ("ADJACENT_QUARK",            75, 30, 130, False),  # quark-kiting flee trigger distance
     ("HULK_DEFLECT_R",            60, 20, 140, False),  # hulk-deflection lookahead radius
+    # Endgame hunt (2026-07-03): pursue the last killable enemy instead of wall-hiding.
+    # HUNT_KILLABLE is a 0/1 toggle gene (starts ON via default; evolution can turn it
+    # off if it hurts); landing in best_params makes the winner json self-contained for
+    # eval_protocol/deploy (no env flag needed).
+    ("HUNT_KILLABLE",              1,  0,   1, True),
+    ("HUNT_STANDOFF",             90, 40, 220, False),
 ]
 NAMES = [p[0] for p in PARAMS]
 LOW = [p[1] for p in PARAMS]; DEF = [p[1] for p in PARAMS]
@@ -139,17 +145,23 @@ def worker(wid, port, task_q, result_q):
     def play_one():
         env.reset(); packet = env._last_packet
         max_wave = env._last_wave; score = env._last_score; steps = 0
+        lives = 0
         while steps < STEPCAP:
             mi, fi = fsm_action(packet)
             _, _, term, trunc, info = env.step(np.array([mi, fi]))
             packet = env._last_packet
             max_wave = max(max_wave, info.get("wave", max_wave))
+            lives = info.get("lives", lives)
             if not (term or trunc):
                 score = info.get("score", score)
             steps += 1
             if term or trunc:
                 break
-        return max_wave, score
+        # lives at exit = the life-economy MARGIN. Death -> env reports 0; reaching
+        # the step cap alive -> banked lives. This is the fitness signal once the
+        # hunt-era candidates saturate the cap (2026-07-03 gen-1: best dist
+        # [80,80,81,81,81] = all games at cap; wave alone had no gradient left).
+        return max_wave, score, lives
 
     while True:
         task = task_q.get()
@@ -157,12 +169,16 @@ def worker(wid, port, task_q, result_q):
             break
         cid, vec, k = task
         apply_params(vec)
-        waves, scores = [], []
+        waves, scores, livesv = [], [], []
         for _ in range(k):
-            w, s = play_one()
-            waves.append(w); scores.append(s)
-        fit = float(np.mean(waves)) + float(np.mean(scores)) / 1e6
-        result_q.put((cid, fit, float(np.mean(waves)), float(np.mean(scores)), waves))
+            w, s, lv = play_one()
+            waves.append(w); scores.append(s); livesv.append(lv)
+        # mean_wave dominates below the cap; at the cap, banked lives (x0.1)
+        # differentiate; score stays as the fine tiebreak.
+        fit = float(np.mean(waves)) + 0.1 * float(np.mean(livesv)) \
+            + float(np.mean(scores)) / 1e6
+        result_q.put((cid, fit, float(np.mean(waves)), float(np.mean(scores)),
+                      waves, float(np.mean(livesv))))
     env.close()
 
 
@@ -215,23 +231,24 @@ def main():
             task_q.put((cid, vec, KGAMES))
         res = [None] * len(pop)
         for _ in range(len(pop)):
-            cid, fit, mw, ms, waves = result_q.get()
-            res[cid] = (fit, mw, ms, waves)
+            cid, fit, mw, ms, waves, ml = result_q.get()
+            res[cid] = (fit, mw, ms, waves, ml)
         # rank
         order = sorted(range(len(pop)), key=lambda i: res[i][0], reverse=True)
         elites = order[:MU]
         # recombine: mean of top-mu (equal weight)
         mean = _clip(np.mean([pop[i] for i in elites], axis=0)).astype(float)
         gen_best_i = order[0]
-        gbf, gbw, gbs, gbwaves = res[gen_best_i]
+        gbf, gbw, gbs, gbwaves, gbl = res[gen_best_i]
         if gbf > best_fit:
             best_fit, best_vec, best_wave = gbf, pop[gen_best_i].copy(), gbw
         sigma = max(0.03, sigma * 0.92)        # anneal exploration
         history.append({"gen": gen, "best_wave": gbw, "best_fit": round(gbf, 3),
                         "mean_wave_top": round(float(np.mean([res[i][1] for i in elites])), 2)})
         log(f"gen {gen+1}/{GENS}: best_wave={gbw:.2f} (dist {sorted(gbwaves)}) "
-            f"score={gbs:.0f} | top{MU}_mean_wave={np.mean([res[i][1] for i in elites]):.2f} "
-            f"| ALLTIME best_wave={best_wave:.2f} | sigma={sigma:.3f}")
+            f"lives_end={gbl:.1f} score={gbs:.0f} "
+            f"| top{MU}_mean_wave={np.mean([res[i][1] for i in elites]):.2f} "
+            f"| ALLTIME best_wave={best_wave:.2f} (fit {best_fit:.2f}) | sigma={sigma:.3f}")
         # checkpoint best each gen
         outf.write_text(json.dumps({
             "tag": TAG, "best_fit": best_fit, "best_wave": best_wave,

@@ -197,6 +197,18 @@ NO_SHOOT_SHELLS = _os.environ.get('FSM_NO_SHOOT_SHELLS', '0') == '1'
 RESCUE_SEEK = _os.environ.get('FSM_RESCUE_SEEK', '0') == '1'
 BRAIN_RESCUE_MULT = float(_os.environ.get('FSM_BRAIN_RESCUE_MULT', '1.0'))
 
+# Endgame hunt (2026-07-03): the idle fallback only ever pursued CHASE_ENEMIES and
+# family — a last remaining Grunt/Brain/Tank beyond the fire radius was NEVER
+# approached, so the FSM stood still (or got herded to a wall by hulk-flee) waiting
+# for it to wander into range. That wall-hiding posture is exactly the pinned
+# positioning that dominates the death taxonomy, and the dead time lets grunts
+# speed up (they accelerate within a wave). HUNT_KILLABLE: when idle, advance on
+# the nearest killable enemy (priority or regular) to HUNT_STANDOFF and keep firing
+# at it even beyond the CLOSE_FIRE radii (shots are free). Settable from the
+# evolved-params json (floats; truthy enables) for clean A/B via eval_protocol.
+HUNT_KILLABLE = float(_os.environ.get('FSM_HUNT', '0'))
+HUNT_STANDOFF = float(_os.environ.get('FSM_HUNT_STANDOFF', '90'))
+
 # Positioning buffer: scale the flee-INITIATION radii so the FSM keeps more distance
 # from threats (targets swarm/pin positioning failures = 81% of deaths). 1.0 = evolved
 # default. Applied lazily on first chooseOutputs() so it composes with EVOLVE_PARAMS
@@ -1242,6 +1254,19 @@ def chooseOutputs(objectList):
             if DEBUG_LEVEL >= DEBUG_LOW:
                 print(f"move toward civilian {nearestCivilian}")
             moveStick = getMoveStick(nearestCivilian, TOWARD, playerLocation)
+        elif HUNT_KILLABLE and _nearest_killable(nearestPriorityEnemy, nearestEnemy) != INVALID:
+            # Endgame hunt: close on the last killable enemy instead of hiding at a
+            # wall until it wanders into range. Stop at HUNT_STANDOFF (the CLOSE_MOVE
+            # flee radii take over below that) and fire at it the whole way in.
+            _ht = _nearest_killable(nearestPriorityEnemy, nearestEnemy)
+            if _ht[DISTANCE] > HUNT_STANDOFF:
+                moveStick = getMoveStick(_ht, TOWARD, playerLocation)
+            else:
+                moveStick = STAY
+            if fireStick == STAY:
+                fireStick = getFireStick(_ht)
+            if DEBUG_LEVEL >= DEBUG_LOW:
+                print(f"hunt killable enemy {_ht} move {moveStick} fire {fireStick}")
         else:
             if DEBUG_LEVEL >= DEBUG_LOW:
                 print("moveStick default to Stay")

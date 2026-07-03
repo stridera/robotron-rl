@@ -3190,3 +3190,131 @@ XENIA PHASE (deployment, per project_goal_xbox_yolo) — recon + first drop into
 - HANDOFF: ~/win/code/robotron/XENIA_CHAMPION_HANDOFF.md (run order, label verification
   checklist at waves 5/7+, calibration notes, open items). Windows-side execution (custom
   Xenia build + player.py + brain + auto_labeler) requires the user's Windows session.
+
+## 2026-07-03 - ENDGAME HUNT fix launched (user-spotted wall-hiding stall)
+User observation: with one enemy (+hulks) left, the champion runs to a wall and hides
+until the enemy closes. Root cause confirmed in code + synthetic scenario: the idle
+fallback only pursues CHASE_ENEMIES/family — a last Grunt/Brain/Tank beyond
+CLOSE_FIRE_ENEMY (evolved 219px) is never approached OR fired at, while hulk-flee
+(CLOSE_MOVE_HULK 62.5) herds the player wall-ward = the pinned posture the death
+taxonomy flags, plus dead time while grunts speed up. FIX: HUNT_KILLABLE (robotron_fsm)
+— idle fallback advances on the nearest killable (priority|regular) enemy to
+HUNT_STANDOFF=90 and fires at it at any range; hulk/projectile flee still outranks it.
+Settable via best_params json => models/fsm_evolved_planner_v2_hunt.json = gen-6
+champion constants + HUNT_KILLABLE=1. Synthetic test: baseline move=STAY/no-fire vs
+hunt move-toward+fire; hulk-close case unchanged (flee wins). GATE: official-books
+replica run on held-out port 9970, N=100, same seed sequence as the 49.13 books
+(logs/official_hunt_9970.log). Compare means (pairing unreliable for planner agents);
+bar = 49.13 [44.3-54.2], P(w>=100) 4/94.
+
+## 2026-07-03 - Overnight: evolution round 2 LAUNCHED (planner_v3, hunt genes added)
+While the hunt A/B runs on 9970, launched the second planner-in-loop evolution round
+(gradient was still live when planner_v2 stopped at gen 8). evolve_fsm.py now has 23
+genes: the 21 from v2 + HUNT_KILLABLE (0/1 toggle, starts ON, evolution can disable)
++ HUNT_STANDOFF (40-220, seed 90). Because HUNT_* land in best_params, the winner
+json is self-contained (no env flag needed at eval/deploy). Run: gens=10 lambda=24
+mu=8 K=5 workers=10 ports 9920+, EVOLVE_STEPCAP=30000 (24k saturated at ~wave 75;
+30k gives headroom to ~wave 90), EVOLVE_PLANNER=1 FSM_RESCUE_SEEK=1 MAME_RL_RESEED=1,
+warm from fsm_evolved_planner_v2_final.json. Log: logs/evolve_planner_v3.log.
+PROMOTION PATH: winner must beat gen-6 paired N>=50 on a training port, then official
+9970 books. Windows sync + windows-agent notification required on promotion (user).
+
+## 2026-07-03 - HUNT INTERIM (games 1-10): 8/10 wave-100+, THREE games at the wave-255 ceiling
+Hunt-variant official replica, first 10 games: 133/255/119/171/255/36/255/77/159/117
+(baseline books: 4 wave-100+ in 94). Score cross-validation: 9/10 games sit at the
+champion's stable 26-28k/wave (the 255s carry ~7.2M = a true ~wave-265 game), so the
+waves are REAL, not decode glitches. KEY MECHANICS CONFIRMED IN ASM (robomame.asm
+$2A94): wave byte is u8; clearing wave 255 wraps INC->0->INC = back to WAVE 1 (plus a
+bonus life at $2A9A) — deep games roll over into the easy band and continue. So the
+wave metric right-censors at 255 and the LIFE ECONOMY HAS FLIPPED POSITIVE: the
+endgame-hunt fix removed enough stall/pin deaths to make games effectively unbounded
+until a variance spike. ANOMALY: game 4 score 41.2M at max-wave 171 (241k/wave) is
+inconsistent (a >=1-wrap game must latch max=255); its score will be excluded from
+books; wave kept. Watch for repeat anomalies at larger N.
+
+## 2026-07-03 - Windows/Xenia sync: hunt champion delivered + windows agent notified
+Interim evidence (11 games, 8 wave-100+) judged strong enough to sync early — the
+Xenia YOLO dataset benefits immediately from deeper play (their brain loop peaked at
+W27). Synced to ~/win/code/robotron: robotron_fsm.py (hunt code), NEW
+fsm_evolved_planner_v2_hunt.json; brain_champion.py now prefers the _hunt json when
+present (delete-to-fallback). Behaviorally verified from WSL (hunt scenario returns
+move=3 fire=3 with the synced files). Notified the windows agent per user instruction:
+update block at top of XENIA_CHAMPION_HANDOFF.md + memory file
+project_champion_hunt_upgrade.md + MEMORY.md pointer (notes the 24/7 loop must be
+RESTARTED to pick up the json preference). Official promotion still gated on the full
+9970 books + planner_v3 evolution outcome.
+
+## 2026-07-03 - Evolution restarted as planner_v3b: lives-margin fitness (cap saturation fix)
+planner_v3 gen 1 confirmed the predicted saturation: best candidate dist
+[80,80,81,81,81] = ALL 5 games at the 30k step cap (~wave 80) — with hunt-era
+candidates the wave metric has no gradient left at the top. Fix (no wall-clock cost):
+worker now returns lives-at-exit (env reports 0 on game over; banked lives if the cap
+is reached alive) and fitness = mean_wave + 0.1*mean(lives_end) + score/1e6. Banked
+lives at the cap = the life-economy margin = exactly the quantity that predicts how
+far past the cap a candidate would run. Below the cap wave still dominates (dead
+candidates have lives_end 0). Relaunched warm from the gen-1 best as planner_v3b
+(pid 15540, ports 9920+, log logs/evolve_planner_v3b.log). Cleanup note: killing the
+v3 run orphaned its spawn workers (mp children reparented to 1) — killed workers then
+force-killed their MAMEs; eval MAME on 9970 untouched (verified only pid 4897 left).
+
+## 2026-07-03 - LATENCY LAB launched (Xenia gap reproduction + extrapolation fix)
+Xenia agent's report (via shared memory): hunt does NOT transfer to Xenia (still
+W9-27; deaths/wave ~1.7-1.8 both eras vs MAME ~1.09) — bottleneck is the perception
+path: entity positions arrive via a ~250ms accumulator (≈4 decision steps @15Hz)
+while player pos reads fresh. Built mame_gym/latency_lab.py to reproduce EXACTLY that
+mix on MAME (entities from packet t-K, player from t) and test the fix: linear
+forward-extrapolation of each entity by its tracked per-step velocity x lag (comp
+mode; clamped to board). Death counting is flicker-proof (start + score//25000 -
+remaining; the $BDEC 1->2->1 transition flicker poisons per-step drop counting).
+Arms: base K=0 + delay K=4 (port 9960), comp K=4 + delay K=2 (port 9962), N=20 each,
+cap 15000, hunt params, reseed. HYPOTHESES: delay-K4 deaths/wave should land near
+Xenia's ~1.7-1.8 (validating the diagnosis); comp-K4 should recover most of it.
+If comp works -> ship extrapolation into the Xenia brain (its VelocityTracker
+already computes velocities) + windows-agent note.
+
+## 2026-07-03 - LATENCY LAB ROUND 1: Xenia gap FULLY EXPLAINED by perception lag; extrapolation = partial fix
+N=20/arm, cap 15000, hunt params, reseed (ports 9960/9962):
+  base  K=0: wave mean 39.05 (cap-censored)  deaths/wave 0.844
+  delay K=2: 12.45  d/w 0.980   | delay K=4 (~267ms ≈ Xenia): 6.90  d/w 0.971
+  comp  K=4:  9.60  d/w 0.844   (+39% waves vs delay-K4; restores BASE death rate)
+VERDICT 1: mixed-staleness lag (entities t-K, player fresh) alone collapses the
+champion into exactly Xenia's observed W9-27 band -> the transfer gap is ~entirely
+perception latency, not planner strategy or game differences.
+VERDICT 2: linear velocity extrapolation recovers the per-wave death rate but only
+part of the depth (9.6 vs 39) — the residual is events INSIDE the lag window
+(new spawns/shots invisible for K steps; matches Xenia's wave-start spawn-in
+deaths). No extrapolation can see those: the REAL fix on Xenia is shrinking the
+accumulator window (C++ side), with extrapolation as the multiplier on top.
+ROUND 2 RUNNING: comp K=2 / comp K=1 (value at realistic shorter lags), delay K=1
+(what a shorter accumulator alone buys), comp K=4 + FSM_BUFFER_SCALE=1.3 (margin
+scaling stacked on extrapolation).
+
+## 2026-07-03 - *** HUNT OFFICIAL BOOKS: mean 173.7 / median 180.5 / 76% of games reach wave 100+ ***
+Held-out port 9970, N=100 (90 valid, 10 wedge-invalidated — wedge rate elevated by
+parallel lab load, all self-healed): wave mean 173.73 [157.1-190.4], median 180.5,
+min 20, MAX = the 255 wire ceiling in 40/90 games (44%). P(w>=25)=0.99, P(w>=20)=1.00.
+**P(w>=100) = 68/90 = 76% (baseline books: 4.3%).** Score mean 5,212,117; score/wave
+30,001 (up from 25.9k — hunting also speeds waves); life-gen/wave 1.20 vs deaths/wave
+1.21 (parity at 3x the throughput). Note: the reported max score 41,242,365 is game 4,
+whose score is inconsistent with its wave-171 latch (a >=1-wrap game must latch 255);
+treat as artifact — next-best max 7,336,225 is trustworthy. THE WAVE 1->100 GOAL IS
+NOW THE TYPICAL GAME, not the tail. CHAMPION RECIPE v4 = v3 + HUNT_KILLABLE=1/
+HUNT_STANDOFF=90 (models/fsm_evolved_planner_v2_hunt.json).
+
+## 2026-07-03 - LATENCY LAB ROUND 2: extrapolation recovers 90% at K=1; buffer scaling doesn't stack
+comp K=1: 35.05 (= 90% of base 39.05!) | comp K=2: 20.74 (delay-K2 12.45)
+delay K=1: 18.31 | comp K=4 + FSM_BUFFER_SCALE=1.3: 9.30 (vs comp-K4 9.60 -> WASH)
+CURVE (wave mean): K=0 39.1 | K=1 18.3->35.1 comp | K=2 12.5->20.7 | K=4 6.9->9.6.
+XENIA PRESCRIPTION: (1) ship velocity extrapolation now (pure win at any lag);
+(2) the dominant lever is shrinking the 250ms accumulator window — at ~66ms (K=1)
+plus extrapolation, Xenia would sit at ~90% of the MAME ceiling, which post-hunt
+means WAVE-100+ GAMES ON XENIA. Margin scaling (buffer 1.3) does not stack; skip.
+
+## 2026-07-03 - Evolution planner_v3b DONE: gen-3 winner fit 94.4, kept hunt ON
+10 gens complete. All-time best from gen 3: best_wave 89.6 at 30k cap, lives_end
+22.4, fit 94.40 (warm-start reference: gen-1-of-v3 fit 81.48 under old fitness).
+Gens 4-10 never beat it (top8_mean drifted 64->83; sigma annealed to 0.065).
+Winner kept HUNT_KILLABLE=1, HUNT_STANDOFF->84.6, tightened ADJACENT->38.6,
+CLOSE_MOVE_HULK->42.6. models/fsm_evolved_planner_v3b.json. VALIDATION LAUNCHING:
+books-replica on 9970 (same seeds as both prior books) — score mean is the primary
+comparator (wave mean is ceiling-censored at 255 in 44% of hunt-books games).

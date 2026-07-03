@@ -1,0 +1,143 @@
+{
+  "tag": "planner_v3b",
+  "best_fit": 94.39586499999999,
+  "best_wave": 89.6,
+  "best_params": {
+    "BORDER_ADJUST": 5.0,
+    "ADJACENT": 38.6,
+    "ADJACENT_HULK": 46.9,
+    "CLOSE": 70.3,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 213.7,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 12.8,
+    "CLOSE_FIRE_PROJECTILE": 40.0,
+    "CLOSE_MOVE_PROJECTILE": 42.8,
+    "CLOSE_FIRE_CHASE_ENEMY": 162.9,
+    "CLOSE_MOVE_CHASE_ENEMY": 88.0,
+    "CLOSE_FIRE_ENEMY": 209.5,
+    "CLOSE_MOVE_ENEMY": 54.6,
+    "CLOSE_FIRE_HULK": 73.0,
+    "CLOSE_MOVE_HULK": 42.6,
+    "CLOSE_FIRE_OBSTACLE": 126.8,
+    "CLOSE_MOVE_OBSTACLE": 10.0,
+    "CLOSE_MOVE_COUNT_LIMIT": 12,
+    "CLOSE_FIRE_COUNT_LIMIT": 1,
+    "CLOSE_MOVE_CIVILIAN": 72.7,
+    "ADJACENT_QUARK": 85.1,
+    "HULK_DEFLECT_R": 130.7,
+    "HUNT_KILLABLE": 1,
+    "HUNT_STANDOFF": 84.6
+  },
+  "mean_params": {
+    "BORDER_ADJUST": 13.5,
+    "ADJACENT": 49.8,
+    "ADJACENT_HULK": 49.3,
+    "CLOSE": 57.1,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 244.7,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 49.8,
+    "CLOSE_FIRE_PROJECTILE": 78.0,
+    "CLOSE_MOVE_PROJECTILE": 40.1,
+    "CLOSE_FIRE_CHASE_ENEMY": 123.7,
+    "CLOSE_MOVE_CHASE_ENEMY": 52.9,
+    "CLOSE_FIRE_ENEMY": 223.2,
+    "CLOSE_MOVE_ENEMY": 38.1,
+    "CLOSE_FIRE_HULK": 47.8,
+    "CLOSE_MOVE_HULK": 32.7,
+    "CLOSE_FIRE_OBSTACLE": 111.3,
+    "CLOSE_MOVE_OBSTACLE": 19.0,
+    "CLOSE_MOVE_COUNT_LIMIT": 9,
+    "CLOSE_FIRE_COUNT_LIMIT": 2,
+    "CLOSE_MOVE_CIVILIAN": 47.4,
+    "ADJACENT_QUARK": 73.3,
+    "HULK_DEFLECT_R": 123.9,
+    "HUNT_KILLABLE": 1,
+    "HUNT_STANDOFF": 89.1
+  },
+  "defaults": {
+    "BORDER_ADJUST": 20,
+    "ADJACENT": 40,
+    "ADJACENT_HULK": 50,
+    "CLOSE": 75,
+    "CLOSE_FIRE_PRIORITY_ENEMY": 150,
+    "CLOSE_MOVE_PRIORITY_ENEMY": 50,
+    "CLOSE_FIRE_PROJECTILE": 150,
+    "CLOSE_MOVE_PROJECTILE": 100,
+    "CLOSE_FIRE_CHASE_ENEMY": 175,
+    "CLOSE_MOVE_CHASE_ENEMY": 50,
+    "CLOSE_FIRE_ENEMY": 75,
+    "CLOSE_MOVE_ENEMY": 50,
+    "CLOSE_FIRE_HULK": 50,
+    "CLOSE_MOVE_HULK": 50,
+    "CLOSE_FIRE_OBSTACLE": 40,
+    "CLOSE_MOVE_OBSTACLE": 40,
+    "CLOSE_MOVE_COUNT_LIMIT": 5,
+    "CLOSE_FIRE_COUNT_LIMIT": 3,
+    "CLOSE_MOVE_CIVILIAN": 75,
+    "ADJACENT_QUARK": 75,
+    "HULK_DEFLECT_R": 60,
+    "HUNT_KILLABLE": 1,
+    "HUNT_STANDOFF": 90
+  },
+  "history": [
+    {
+      "gen": 0,
+      "best_wave": 79.0,
+      "best_fit": 81.481,
+      "mean_wave_top": 59.98
+    },
+    {
+      "gen": 1,
+      "best_wave": 82.0,
+      "best_fit": 85.979,
+      "mean_wave_top": 64.55
+    },
+    {
+      "gen": 2,
+      "best_wave": 89.6,
+      "best_fit": 94.396,
+      "mean_wave_top": 73.77
+    },
+    {
+      "gen": 3,
+      "best_wave": 81.4,
+      "best_fit": 85.98,
+      "mean_wave_top": 75.03
+    },
+    {
+      "gen": 4,
+      "best_wave": 89.4,
+      "best_fit": 93.267,
+      "mean_wave_top": 81.68
+    },
+    {
+      "gen": 5,
+      "best_wave": 86.2,
+      "best_fit": 90.308,
+      "mean_wave_top": 79.03
+    },
+    {
+      "gen": 6,
+      "best_wave": 86.8,
+      "best_fit": 90.964,
+      "mean_wave_top": 80.0
+    },
+    {
+      "gen": 7,
+      "best_wave": 88.8,
+      "best_fit": 93.756,
+      "mean_wave_top": 80.38
+    },
+    {
+      "gen": 8,
+      "best_wave": 85.8,
+      "best_fit": 90.014,
+      "mean_wave_top": 79.33
+    },
+    {
+      "gen": 9,
+      "best_wave": 85.6,
+      "best_fit": 90.16,
+      "mean_wave_top": 82.92
+    }
+  ],
+  "gen_done": 10
+}
