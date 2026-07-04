@@ -3318,3 +3318,19 @@ Winner kept HUNT_KILLABLE=1, HUNT_STANDOFF->84.6, tightened ADJACENT->38.6,
 CLOSE_MOVE_HULK->42.6. models/fsm_evolved_planner_v3b.json. VALIDATION LAUNCHING:
 books-replica on 9970 (same seeds as both prior books) — score mean is the primary
 comparator (wave mean is ceiling-censored at 255 in 44% of hunt-books games).
+
+## 2026-07-03 - v3b VALIDATION VERDICT: INCUMBENT HOLDS — champion stays v4 (v2_hunt)
+planner_v3b books-replica (9970, N=84 valid, 16 wedge-invalidated): wave mean 155.58
+[135.2-175.5] / median 173 / min 6 / 62% w100+ / score mean 4.32M (27.8k/wave);
+life economy 1.11/1.12. LOSES to the hunt champion on every metric (173.7 / 180.5 /
+min 20 / 76% / 5.21M / 30.0k/wave). Root read: lives-margin-at-30k-cap fitness
+overweighted late-game economy and gave back early-game robustness (v3b has w6/w8/w11
+deaths; hunt's floor is w20, P(w>=25)=0.99 vs 0.93). CHAMPION UNCHANGED:
+models/fsm_evolved_planner_v2_hunt.json (+ clearance ASMDYN H6/D18/M10 +
+FSM_RESCUE_SEEK) — already deployed to Xenia. Evolution lesson for any round 3:
+fitness must include the early-game floor (e.g. min-wave term or per-seed harmonic
+mean), not just mean+margin. NOTE: wedge rate on ultra-long-game evals is ~14-16%
+(genuine MAME/lua hangs, 120s timeout; self-heal contains it) — backlog item.
+MAME-side strength work now has diminishing returns vs the Xenia perception window
+(the deployment bottleneck, prescription delivered). Overnight arc complete:
+49.1 -> 173.7 official, wave 100 in 76% of games, Xenia gap root-caused + fix shipped.
